@@ -1,0 +1,411 @@
+{%- doc -%}
+  Shell of the add-to-cart offer pop-up (native <dialog>). Rendered once in
+  layout/theme.liquid. Content is built by assets/apibavaria-offers.js from the offer
+  data of the product that was added (snippets/apibavaria-offer-data.liquid).
+  Controlled by the theme settings `apb_offers_enabled` and `apb_offer_popup`.
+
+  @example
+  {% render 'apibavaria-offer-popup' %}
+{%- enddoc -%}
+
+{%- if settings.apb_offers_enabled and settings.apb_offer_popup and template.name != 'cart' -%}
+  <dialog id="apb-offer-dialog" class="apb-popup" aria-labelledby="apb-offer-dialog-title">
+    <div class="apb-popup__panel" data-apb-offer-panel></div>
+  </dialog>
+  <script type="module" src="{{ 'apibavaria-offers.js' | asset_url }}"></script>
+{%- endif -%}
+
+{% stylesheet %}
+  .apb-popup {
+    --apb-popup-ink: #3f4a1f;
+    --apb-popup-muted: #5f6c39;
+    --apb-popup-green: #6b7d32;
+    --apb-popup-line: #d8dfbd;
+    --apb-popup-mist: #f5f7ec;
+    --apb-popup-sage: #e7ecd4;
+
+    width: min(100% - 24px, 520px);
+    max-height: min(100% - 24px, 760px);
+    margin: auto;
+    padding: 0;
+    overflow: auto;
+    border: 1px solid var(--apb-popup-line);
+    border-radius: 0;
+    background: #fff;
+    color: var(--apb-popup-ink);
+    box-shadow: none;
+  }
+
+  .apb-popup::backdrop {
+    background: rgb(63 74 31 / 0.45);
+  }
+
+  .apb-popup * {
+    box-sizing: border-box;
+  }
+
+  .apb-popup__panel {
+    padding: 20px 22px 18px;
+  }
+
+  .apb-popup__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--apb-popup-line);
+  }
+
+  .apb-popup__added {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .apb-popup__tick {
+    position: relative;
+    width: 18px;
+    height: 18px;
+    background: var(--apb-popup-green);
+  }
+
+  .apb-popup__tick::after {
+    position: absolute;
+    inset: 3px 6px 5px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    content: '';
+  }
+
+  .apb-popup__close {
+    display: grid;
+    width: 36px;
+    height: 36px;
+    min-height: 36px !important;
+    padding: 0;
+    place-items: center;
+    border: 1px solid var(--apb-popup-line);
+    border-radius: 0;
+    background: #fff;
+    color: var(--apb-popup-ink);
+    cursor: pointer;
+  }
+
+  .apb-popup__close svg {
+    width: 14px;
+    height: 14px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+  }
+
+  .apb-popup__product {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+  }
+
+  .apb-popup__product img {
+    width: 52px;
+    height: 52px;
+    object-fit: contain;
+    background: var(--apb-popup-mist);
+  }
+
+  .apb-popup__product p {
+    margin: 0;
+    font-size: 0.82rem;
+    font-weight: 500;
+    line-height: 1.35;
+  }
+
+  .apb-popup__offer {
+    padding: 16px;
+    border: 1px solid var(--apb-popup-line);
+    background: var(--apb-popup-mist);
+  }
+
+  .apb-popup__eyebrow,
+  .apb-popup__label {
+    margin: 0 0 6px;
+    color: var(--apb-popup-green);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .apb-popup__title {
+    margin: 0;
+    font-size: clamp(1.25rem, 4vw, 1.55rem);
+    line-height: 1.05;
+    letter-spacing: -0.04em;
+  }
+
+  .apb-popup__text {
+    margin: 8px 0 14px;
+    color: var(--apb-popup-muted);
+    font-size: 0.8rem;
+    line-height: 1.5;
+  }
+
+  .apb-popup__tiers,
+  .apb-popup__cards {
+    display: grid;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .apb-popup__tier {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 12px;
+    padding: 10px 12px;
+    border: 1px solid var(--apb-popup-line);
+    background: #fff;
+  }
+
+  .apb-popup__tier.is-reached {
+    border-color: var(--apb-popup-green);
+    background: var(--apb-popup-sage);
+  }
+
+  .apb-popup__tier-copy {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.84rem;
+  }
+
+  .apb-popup__tier-copy strong {
+    font-weight: 600;
+  }
+
+  .apb-popup__badge {
+    padding: 2px 6px;
+    background: var(--apb-popup-green);
+    color: #fff;
+    font-size: 0.68rem;
+    font-weight: 600;
+  }
+
+  .apb-popup__done {
+    color: var(--apb-popup-green);
+    font-size: 0.76rem;
+    font-weight: 600;
+  }
+
+  .apb-popup .apb-popup__add {
+    min-height: 40px !important;
+    padding: 8px 12px;
+    font-size: 0.76rem;
+  }
+
+  .apb-popup .apb-popup__add--wide {
+    width: 100%;
+    min-height: 46px !important;
+    margin-top: 10px;
+    font-size: 0.82rem;
+  }
+
+  .apb-popup__add[aria-busy='true'],
+  .apb-popup__plus[aria-busy='true'] {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  .apb-popup__mix {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--apb-popup-line);
+  }
+
+  .apb-popup__card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border: 1px solid var(--apb-popup-line);
+    background: #fff;
+  }
+
+  .apb-popup__card img,
+  .apb-popup__ph {
+    flex: 0 0 48px;
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    background: var(--apb-popup-mist);
+  }
+
+  .apb-popup__card--partner {
+    flex-wrap: wrap;
+  }
+
+  .apb-popup__card--partner img,
+  .apb-popup__card--partner .apb-popup__ph {
+    flex-basis: 56px;
+    width: 56px;
+    height: 56px;
+  }
+
+  .apb-popup__card-copy {
+    display: grid;
+    flex: 1;
+    gap: 2px;
+    min-width: 0;
+    font-size: 0.74rem;
+    line-height: 1.3;
+  }
+
+  .apb-popup__card-copy a {
+    color: var(--apb-popup-ink);
+    font-weight: 600;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+  }
+
+  .apb-popup__card-copy span {
+    color: var(--apb-popup-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .apb-popup__price s {
+    font-size: 0.7rem;
+  }
+
+  .apb-popup__price strong {
+    color: var(--apb-popup-ink);
+    font-weight: 600;
+  }
+
+  .apb-popup__plus {
+    flex: 0 0 36px;
+    width: 36px;
+    height: 36px;
+    min-height: 36px !important;
+    padding: 0;
+    border: 1px solid var(--apb-popup-green);
+    border-radius: 0;
+    background: #fff;
+    color: var(--apb-popup-green);
+    font-size: 1.1rem;
+    font-weight: 600;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .apb-popup__plus:hover {
+    background: var(--apb-popup-green);
+    color: #fff;
+  }
+
+  .apb-popup__message {
+    min-height: 1.2em;
+    margin: 10px 0 0;
+    color: var(--apb-popup-green);
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+
+  .apb-popup__message:empty {
+    min-height: 0;
+    margin: 0;
+  }
+
+  .apb-popup__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 14px;
+  }
+
+  .apb-popup__link {
+    min-height: 40px !important;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--apb-popup-muted);
+    font-size: 0.76rem;
+    font-weight: 500 !important;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+
+  .apb-popup .apb-popup__secondary {
+    min-height: 44px !important;
+    padding: 10px 18px;
+    font-size: 0.8rem;
+  }
+
+  .apb-popup__fine {
+    margin: 12px 0 0;
+    color: var(--apb-popup-muted);
+    font-size: 0.66rem;
+    line-height: 1.4;
+  }
+
+  .apb-popup button:focus-visible,
+  .apb-popup a:focus-visible {
+    outline: 3px solid #a1ad78;
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .apb-popup[open] {
+      animation: apb-popup-in 0.28s var(--animation-timing-fade-in, cubic-bezier(0.16, 1, 0.3, 1));
+    }
+
+    .apb-popup[open]::backdrop {
+      animation: apb-popup-fade 0.28s ease;
+    }
+  }
+
+  @keyframes apb-popup-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+  }
+
+  @keyframes apb-popup-fade {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @media (max-width: 749px) {
+    .apb-popup {
+      width: 100%;
+      max-width: none;
+      max-height: 88vh;
+      margin: auto 0 0;
+      border-inline: 0;
+      border-bottom: 0;
+    }
+
+    .apb-popup__panel {
+      padding: 16px 16px 14px;
+    }
+
+    .apb-popup__tier .apb-popup__add {
+      width: 100%;
+    }
+
+    .apb-popup__card--partner .apb-popup__add {
+      width: 100%;
+    }
+  }
+{% endstylesheet %}

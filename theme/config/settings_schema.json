@@ -1194,6 +1194,28 @@
     ]
   },
   {
+    "name": "API Bavaria Angebote",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Mengenrabatt (Bienenfutter, Gläser, Mittelwände, Rähmchen: ab 2 Stück −5 %, ab 3 Stück −10 %, gemischt je Kategorie) und Set-Angebote mit passendem Zubehör (−10 % / −15 %). Die Rabatte selbst sind in Shopify unter Rabatte angelegt."
+      },
+      {
+        "type": "checkbox",
+        "id": "apb_offers_enabled",
+        "label": "Mengen- und Set-Angebote anzeigen",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "apb_offer_popup",
+        "label": "Angebots-Pop-up nach „In den Warenkorb“",
+        "info": "Erscheint pro Produkt höchstens einmal pro Sitzung und nur, wenn noch ein Rabatt erreichbar ist.",
+        "default": true
+      }
+    ]
+  },
+  {
     "name": "t:names.badges",
     "settings": [
       {

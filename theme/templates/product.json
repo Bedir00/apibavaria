@@ -312,6 +312,10 @@
               "settings": {
                 "show_faq": false
               }
+            },
+            "api_pdp_offer": {
+              "type": "api-pdp-offer",
+              "settings": {}
             }
           },
           "block_order": [
@@ -319,6 +323,7 @@
             "divider_VJhene",
             "variant_picker_R3rGDr",
             "api_product_inventory",
+            "api_pdp_offer",
             "buy_buttons_eYQEYi",
             "api_pdp_details"
           ]

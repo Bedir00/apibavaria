@@ -1,0 +1,534 @@
+{%- doc -%}
+  Offer box in the product buy box.
+  - Quantity products (Bienenfutter, Gläser, Mittelwände, Rähmchen): tier picker
+    1 / 2 (−5 %) / 3 (−10 %) that sets the quantity selector. Tiers count mix & match
+    across the whole category.
+  - Bundle products: set of this product plus up to two accessories (apb.zubehoer);
+    −10 % with one accessory, −15 % with both. Added in one click; the matching
+    discount code is applied in the background.
+  The offer data comes from snippets/apibavaria-offer-data.liquid and is also used by
+  the add-to-cart pop-up. Behaviour lives in assets/apibavaria-offers.js.
+{%- enddoc -%}
+
+{%- liquid
+  assign product_resource = closest.product
+  assign current_variant = product_resource.selected_or_first_available_variant
+  assign unit_price = current_variant.price
+  assign bundle_partners = product_resource.metafields.apb.zubehoer.value
+
+  assign quantity_handles = 'bienenfutter,glaser,mittelwande,rahmchen' | split: ','
+  assign offer_type = ''
+  assign offer_collection_handle = ''
+  for product_collection in product_resource.collections
+    if quantity_handles contains product_collection.handle
+      assign offer_type = 'quantity'
+      assign offer_collection_handle = product_collection.handle
+      break
+    endif
+  endfor
+  if offer_type == '' and bundle_partners.size > 0
+    assign offer_type = 'bundle'
+  endif
+
+  case offer_collection_handle
+    when 'bienenfutter'
+      assign offer_mix_text = 'Alle Futterartikel zählen zusammen – auch gemischt.'
+    when 'glaser'
+      assign offer_mix_text = 'Alle Glas-Kartons zählen zusammen – auch gemischt.'
+    when 'mittelwande'
+      assign offer_mix_text = 'Alle Mittelwand-Packungen zählen zusammen – auch gemischt.'
+    when 'rahmchen'
+      assign offer_mix_text = 'Alle Rähmchen-Packungen zählen zusammen – auch gemischt.'
+  endcase
+-%}
+
+{%- if settings.apb_offers_enabled and offer_type != '' and current_variant.available -%}
+  <script type="module" src="{{ 'apibavaria-offers.js' | asset_url }}"></script>
+  {% render 'apibavaria-offer-data', product: product_resource %}
+
+  {%- if offer_type == 'quantity' -%}
+    <apb-offer-tiers
+      class="api-offer"
+      data-product-id="{{ product_resource.id }}"
+      {{ block.shopify_attributes }}
+    >
+      <div class="api-offer__header">
+        <p class="api-offer__eyebrow">Mengenrabatt</p>
+        <p class="api-offer__hint">{{ offer_mix_text }}</p>
+      </div>
+      <div class="api-offer__tiers" role="radiogroup" aria-label="Menge wählen">
+        {%- for tier_quantity in (1..3) -%}
+          {%- liquid
+            case tier_quantity
+              when 2
+                assign tier_percent = 5
+              when 3
+                assign tier_percent = 10
+              else
+                assign tier_percent = 0
+            endcase
+            assign tier_factor = 100 | minus: tier_percent
+            assign tier_full = unit_price | times: tier_quantity
+            assign tier_total = tier_full | times: tier_factor | divided_by: 100.0 | round
+            assign tier_saving = tier_full | minus: tier_total
+          -%}
+          <button
+            type="button"
+            class="api-offer__tier"
+            role="radio"
+            aria-checked="{% if tier_quantity == 1 %}true{% else %}false{% endif %}"
+            data-quantity="{{ tier_quantity }}"
+          >
+            <span class="api-offer__tier-main">
+              <span class="api-offer__tier-qty">{{ tier_quantity }} Stück</span>
+              {%- if tier_percent > 0 -%}
+                <span class="api-offer__badge">−{{ tier_percent }} %</span>
+              {%- endif -%}
+              {%- if tier_quantity == 3 -%}
+                <span class="api-offer__flag">Bester Preis</span>
+              {%- endif -%}
+            </span>
+            <span class="api-offer__tier-price">
+              {%- if tier_saving > 0 -%}
+                <s>{{ tier_full | money }}</s>
+              {%- endif -%}
+              <strong>{{ tier_total | money }}</strong>
+              {%- if tier_saving > 0 -%}
+                <span class="api-offer__saving">Du sparst {{ tier_saving | money }}</span>
+              {%- endif -%}
+            </span>
+          </button>
+        {%- endfor -%}
+      </div>
+      <p class="api-offer__fine">Der Rabatt wird im Warenkorb automatisch abgezogen.</p>
+    </apb-offer-tiers>
+  {%- else -%}
+    {%- liquid
+      assign set_full = unit_price
+      assign set_partner_count = 0
+      for partner in bundle_partners limit: 2
+        assign partner_variant = partner.selected_or_first_available_variant
+        if partner_variant.available
+          assign set_full = set_full | plus: partner_variant.price
+          assign set_partner_count = set_partner_count | plus: 1
+        endif
+      endfor
+    -%}
+    {%- if set_partner_count > 0 -%}
+      <apb-offer-set
+        class="api-offer api-offer--set"
+        data-product-id="{{ product_resource.id }}"
+        {{ block.shopify_attributes }}
+      >
+        <div class="api-offer__header">
+          <p class="api-offer__eyebrow">Im Set günstiger</p>
+          <p class="api-offer__hint">
+            Mit 1 Zubehör −10 %, mit beiden −15 % auf das Zubehör.
+          </p>
+        </div>
+
+        <ul class="api-offer__set-list">
+          <li class="api-offer__set-item api-offer__set-item--main">
+            <span class="api-offer__check api-offer__check--fixed" aria-hidden="true"></span>
+            <span class="api-offer__set-media">
+              {%- if product_resource.featured_image -%}
+                {{ product_resource.featured_image | image_url: width: 120 | image_tag: loading: 'lazy', width: 60, height: 60, alt: '' }}
+              {%- endif -%}
+            </span>
+            <span class="api-offer__set-copy">
+              <span class="api-offer__set-title">Dieser Artikel</span>
+              <span class="api-offer__set-price">{{ unit_price | money }}</span>
+            </span>
+          </li>
+          {%- for partner in bundle_partners limit: 2 -%}
+            {%- assign partner_variant = partner.selected_or_first_available_variant -%}
+            {%- if partner_variant.available -%}
+              <li class="api-offer__set-item">
+                <label class="api-offer__set-label">
+                  <input
+                    type="checkbox"
+                    class="api-offer__set-input"
+                    checked
+                    data-variant-id="{{ partner_variant.id }}"
+                    data-product-id="{{ partner.id }}"
+                    data-price="{{ partner_variant.price }}"
+                  >
+                  <span class="api-offer__check" aria-hidden="true"></span>
+                  <span class="api-offer__set-media">
+                    {%- if partner.featured_image -%}
+                      {{ partner.featured_image | image_url: width: 120 | image_tag: loading: 'lazy', width: 60, height: 60, alt: '' }}
+                    {%- endif -%}
+                  </span>
+                  <span class="api-offer__set-copy">
+                    <span class="api-offer__set-title">
+                      {{- partner.title | escape -}}
+                      {%- unless partner.has_only_default_variant %} – {{ partner_variant.title | escape }}{% endunless -%}
+                    </span>
+                    <span class="api-offer__set-price">{{ partner_variant.price | money }}</span>
+                  </span>
+                </label>
+                <a class="api-offer__set-link" href="{{ partner.url }}">Details<span class="visually-hidden"> zu {{ partner.title | escape }}</span></a>
+              </li>
+            {%- endif -%}
+          {%- endfor -%}
+        </ul>
+
+        <div class="api-offer__set-summary" aria-live="polite">
+          <span class="api-offer__set-total-label">Set-Preis</span>
+          <span class="api-offer__set-total">
+            <s data-apb-set-full>{{ set_full | money }}</s>
+            <strong data-apb-set-total>{{ set_full | money }}</strong>
+          </span>
+          <span class="api-offer__saving" data-apb-set-saving></span>
+        </div>
+
+        <button type="button" class="api-offer__set-button button" data-apb-set-add>
+          Set in den Warenkorb
+        </button>
+        <p class="api-offer__status" data-apb-set-status role="status"></p>
+        <p class="api-offer__fine">Rabatt auf das Zubehör, wird im Warenkorb automatisch abgezogen.</p>
+      </apb-offer-set>
+    {%- endif -%}
+  {%- endif -%}
+{%- else -%}
+  <div hidden shopify-block-empty {{ block.shopify_attributes }}></div>
+{%- endif -%}
+
+{% stylesheet %}
+  .api-offer {
+    --api-offer-ink: #3f4a1f;
+    --api-offer-muted: #5f6c39;
+    --api-offer-green: #6b7d32;
+    --api-offer-line: #d8dfbd;
+    --api-offer-mist: #f5f7ec;
+    --api-offer-sage: #e7ecd4;
+
+    display: block;
+    width: 100%;
+    color: var(--api-offer-ink);
+  }
+
+  .api-offer * {
+    box-sizing: border-box;
+  }
+
+  .api-offer__header {
+    display: grid;
+    gap: 4px;
+    margin-bottom: 10px;
+  }
+
+  .api-offer__eyebrow {
+    margin: 0;
+    color: var(--api-offer-green);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .api-offer__hint,
+  .api-offer__fine,
+  .api-offer__status {
+    margin: 0;
+    color: var(--api-offer-muted);
+    font-size: 0.74rem;
+    line-height: 1.45;
+  }
+
+  .api-offer__fine {
+    margin-top: 8px;
+    font-size: 0.68rem;
+  }
+
+  .api-offer__status:empty {
+    display: none;
+  }
+
+  .api-offer__status {
+    margin-top: 8px;
+    color: var(--api-offer-ink);
+    font-weight: 600;
+  }
+
+  /* Tier picker */
+  .api-offer__tiers {
+    display: grid;
+    gap: 6px;
+  }
+
+  .api-offer__tier {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    min-height: 56px;
+    padding: 10px 14px;
+    border: 1px solid var(--api-offer-line);
+    border-radius: 0;
+    background: #fff;
+    color: inherit;
+    font: inherit;
+    letter-spacing: 0;
+    text-align: start;
+    cursor: pointer;
+    transition: border-color var(--animation-speed-slow, 0.2s) ease, background-color var(--animation-speed-slow, 0.2s) ease;
+  }
+
+  .api-offer__tier:hover {
+    border-color: var(--api-offer-green);
+  }
+
+  .api-offer__tier[aria-checked='true'] {
+    border-color: var(--api-offer-ink);
+    background: var(--api-offer-mist);
+    box-shadow: inset 0 0 0 1px var(--api-offer-ink) !important;
+  }
+
+  .api-offer__tier:focus-visible {
+    outline: 3px solid #a1ad78;
+    outline-offset: 2px;
+  }
+
+  .api-offer__tier-main {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 8px;
+    min-width: 0;
+  }
+
+  .api-offer__tier-qty {
+    font-size: 0.86rem;
+    font-weight: 600;
+  }
+
+  .api-offer__badge {
+    padding: 2px 6px;
+    background: var(--api-offer-green);
+    color: #fff;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+
+  .api-offer__flag {
+    padding: 1px 6px;
+    border: 1px solid var(--api-offer-ink);
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .api-offer__tier-price {
+    display: grid;
+    justify-items: end;
+    gap: 1px;
+    font-variant-numeric: tabular-nums;
+    text-align: end;
+  }
+
+  .api-offer__tier-price s,
+  .api-offer__set-total s {
+    color: var(--api-offer-muted);
+    font-size: 0.72rem;
+  }
+
+  .api-offer__tier-price strong,
+  .api-offer__set-total strong {
+    font-size: 0.92rem;
+    font-weight: 600;
+  }
+
+  .api-offer__saving {
+    color: var(--api-offer-green);
+    font-size: 0.68rem;
+    font-weight: 600;
+  }
+
+  .api-offer__saving:empty {
+    display: none;
+  }
+
+  /* Set */
+  .api-offer--set {
+    padding: 16px;
+    border: 1px solid var(--api-offer-line);
+    background: var(--api-offer-mist);
+  }
+
+  .api-offer__set-list {
+    display: grid;
+    gap: 6px;
+    margin: 0 0 12px;
+    padding: 0;
+    list-style: none;
+  }
+
+  .api-offer__set-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border: 1px solid var(--api-offer-line);
+    background: #fff;
+  }
+
+  .api-offer__set-label {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    cursor: pointer;
+  }
+
+  .api-offer__set-item--main {
+    gap: 10px;
+  }
+
+  .api-offer__set-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+  }
+
+  .api-offer__check {
+    position: relative;
+    flex: 0 0 18px;
+    width: 18px;
+    height: 18px;
+    border: 1px solid var(--api-offer-ink);
+    background: #fff;
+  }
+
+  .api-offer__set-input:checked + .api-offer__check,
+  .api-offer__check--fixed {
+    border-color: var(--api-offer-green);
+    background: var(--api-offer-green);
+  }
+
+  .api-offer__set-input:checked + .api-offer__check::after,
+  .api-offer__check--fixed::after {
+    position: absolute;
+    inset: 3px 5px 5px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    content: '';
+  }
+
+  .api-offer__check--fixed {
+    opacity: 0.55;
+  }
+
+  .api-offer__set-input:focus-visible + .api-offer__check {
+    outline: 3px solid #a1ad78;
+    outline-offset: 2px;
+  }
+
+  .api-offer__set-media {
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+    background: var(--api-offer-mist);
+  }
+
+  .api-offer__set-media img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .api-offer__set-copy {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .api-offer__set-title {
+    font-size: 0.78rem;
+    font-weight: 600;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+  }
+
+  .api-offer__set-price {
+    color: var(--api-offer-muted);
+    font-size: 0.74rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .api-offer__set-link {
+    flex: 0 0 auto;
+    color: var(--api-offer-green);
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
+
+  .api-offer__set-summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4px 12px;
+    margin-bottom: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--api-offer-line);
+  }
+
+  .api-offer__set-total-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+
+  .api-offer__set-total {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .api-offer__set-summary .api-offer__saving {
+    flex-basis: 100%;
+    text-align: end;
+  }
+
+  .api-offer__set-button {
+    width: 100%;
+  }
+
+  .api-offer__set-button[aria-busy='true'] {
+    opacity: 0.7;
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .api-offer__tier {
+      transition: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Mengen- & Set-Angebot",
+  "tag": null,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Mengenrabatt (Bienenfutter, Gläser, Mittelwände, Rähmchen) oder Set-Angebot mit dem Zubehör aus dem Metafeld „PDP: Passendes Zubehör“. Die Prozentwerte müssen zu den Shopify-Rabatten passen (siehe README)."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Mengen- & Set-Angebot",
+      "category": "Produkt"
+    }
+  ]
+}
+{% endschema %}

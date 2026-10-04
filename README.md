@@ -79,6 +79,50 @@ Theme-Dateien:
 Die Inhalte für alle 23 aktiven Produkte liegen in `content/pdp_content.py`. Sie
 stützen sich auf die Angaben in den Produktbeschreibungen.
 
+## Angebote & Pop-up
+
+Mengenrabatte und Zubehör-Sets, auf der Produktseite und als Pop-up nach „In den
+Warenkorb“. Die Rabatte rechnet ausschließlich Shopify (native Rabatte). Das Theme
+zeigt sie nur an und löst die Set-Codes im Hintergrund ein.
+
+| Angebot | Gilt für | Shopify-Rabatt |
+| --- | --- | --- |
+| Mengenrabatt: ab 2 Stück −5 %, ab 3 Stück −10 %, gemischt je Kategorie | Kollektionen Bienenfutter, Gläser, Mittelwände, Rähmchen | 8 automatische Rabatte „Mengenrabatt <Kategorie>: ab 2/3 Stück …“ |
+| Set: passendes Zubehör −10 %, beide Zubehörartikel −15 % (Rabatt aufs Zubehör) | Fütterungszubehör und Trafolöter (Zubehör = erste zwei Einträge aus `apb.zubehoer`) | 14 Rabattcodes `APB-SET10-<Produkt-ID>` / `APB-SET15-<Produkt-ID>` (Kaufe X, erhalte Y) |
+
+**Ablauf**
+
+- **PDP:** Der Block „Mengen- & Set-Angebot“ steht über dem Warenkorb-Button. Bei
+  Mengenprodukten wählt der Kunde 1 / 2 / 3 Stück mit Preis und Ersparnis, die Auswahl
+  setzt die Menge. Bei Set-Produkten wählt er das Zubehör per Checkbox und legt das Set
+  mit einem Klick in den Warenkorb, der Set-Code wird automatisch eingelöst.
+- **Pop-up:** Nach „In den Warenkorb“ zeigt ein Fenster das Angebot mit
+  1-Klick-Buttons. Bei Mengenprodukten sind das „+1 / +2 hinzufügen“ und zwei Produkte
+  zum Kombinieren aus derselben Kategorie, bei Set-Produkten die einzelnen Zubehörartikel
+  oder „Beide hinzufügen“. Danach öffnet sich der Warenkorb-Drawer. Das Pop-up erscheint
+  pro Produkt höchstens einmal pro Sitzung und nur, wenn noch ein Rabatt erreichbar ist.
+- Pro Warenkorbzeile greift nur ein Produktrabatt, Shopify nimmt den höheren. Darauf
+  weist das Pop-up hin.
+
+**Theme-Einstellungen > API Bavaria Angebote:** Angebote an/aus, Pop-up an/aus.
+
+**Dateien:** `blocks/api-pdp-offer.liquid`, `snippets/apibavaria-offer-data.liquid`
+(Angebotsdaten je Produkt, enthält die Prozentwerte und Codes),
+`snippets/apibavaria-offer-popup.liquid`, `assets/apibavaria-offers.js`,
+`layout/theme.liquid` (bindet das Pop-up ein), `templates/product.json`,
+`config/settings_schema.json`.
+
+**Wichtig:** Ändert sich ein Prozentwert, muss er im Shopify-Rabatt **und** in
+`snippets/apibavaria-offer-data.liquid` sowie im PDP-Block angepasst werden.
+
+### Aktivierung der Mengenrabatte
+
+Die 8 automatischen Mengenrabatte sind angelegt, aber **geplant (Start 01.01.2099)**,
+damit sie nicht schon im Live-Shop gelten, bevor das neue Theme sichtbar ist. Beim
+Veröffentlichen des Themes: *Shopify-Admin > Rabatte*, die acht „Mengenrabatt …“-Einträge
+öffnen und das Startdatum auf heute setzen. Die Set-Codes sind aktiv. Sie werden nur
+vom neuen Theme eingelöst.
+
 ## Installation
 
 Alle Dateien (Motion Graphics und PDP) sind bereits im unveröffentlichten Theme

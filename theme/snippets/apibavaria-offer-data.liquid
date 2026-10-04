@@ -1,0 +1,135 @@
+{%- doc -%}
+  Outputs the offer configuration for one product as JSON, read by
+  assets/apibavaria-offers.js (PDP offer block and add-to-cart pop-up).
+
+  Offer types:
+  - quantity: products in a quantity collection (Bienenfutter, Gläser, Mittelwände,
+    Rähmchen). Mix & match tiers across the whole collection.
+  - bundle: every other product with curated accessories (metafield apb.zubehoer).
+    The first two accessories form the set.
+
+  The percentages and codes below MUST match the Shopify discounts:
+  - automatic "Mengenrabatt <Kategorie> ab 2/3" (amount off products, collection,
+    minimum quantity 2 / 3)
+  - discount codes APB-SET10-<product id> / APB-SET15-<product id> (buy X get Y)
+  See README "Angebote & Pop-up".
+
+  @param {object} product - The product to describe
+
+  @example
+  {% render 'apibavaria-offer-data', product: product %}
+{%- enddoc -%}
+
+{%- liquid
+  assign quantity_handles = 'bienenfutter,glaser,mittelwande,rahmchen' | split: ','
+  assign offer_type = ''
+  assign offer_collection_handle = ''
+
+  for product_collection in product.collections
+    if quantity_handles contains product_collection.handle
+      assign offer_type = 'quantity'
+      assign offer_collection_handle = product_collection.handle
+      break
+    endif
+  endfor
+
+  assign bundle_partners = product.metafields.apb.zubehoer.value
+  if offer_type == '' and bundle_partners.size > 0
+    assign offer_type = 'bundle'
+  endif
+
+  case offer_collection_handle
+    when 'bienenfutter'
+      assign offer_label = 'Bienenfutter'
+      assign offer_unit_one = 'Futterartikel'
+      assign offer_unit_other = 'Futterartikel'
+    when 'glaser'
+      assign offer_label = 'Gläser'
+      assign offer_unit_one = 'Glas-Karton'
+      assign offer_unit_other = 'Glas-Kartons'
+    when 'mittelwande'
+      assign offer_label = 'Mittelwände'
+      assign offer_unit_one = 'Mittelwand-Packung'
+      assign offer_unit_other = 'Mittelwand-Packungen'
+    when 'rahmchen'
+      assign offer_label = 'Rähmchen'
+      assign offer_unit_one = 'Rähmchen-Packung'
+      assign offer_unit_other = 'Rähmchen-Packungen'
+  endcase
+
+  assign current_variant = product.selected_or_first_available_variant
+-%}
+
+{%- if offer_type != '' -%}
+  <script type="application/json" data-apb-offer="{{ product.id }}">
+    {
+      "productId": {{ product.id }},
+      "variantId": {{ current_variant.id }},
+      "title": {{ product.title | json }},
+      "url": {{ product.url | json }},
+      "image": {% if product.featured_image %}{{ product.featured_image | image_url: width: 240 | json }}{% else %}null{% endif %},
+      "price": {{ current_variant.price }},
+      "moneyFormat": {{ shop.money_format | json }},
+      "currency": {{ cart.currency.iso_code | json }},
+      "type": {{ offer_type | json }}
+      {%- if offer_type == 'quantity' -%}
+        {%- assign offer_collection = collections[offer_collection_handle] -%}
+        ,
+        "quantity": {
+          "label": {{ offer_label | json }},
+          "unitOne": {{ offer_unit_one | json }},
+          "unitOther": {{ offer_unit_other | json }},
+          "collectionUrl": {{ offer_collection.url | json }},
+          "tiers": [{ "min": 2, "percent": 5 }, { "min": 3, "percent": 10 }],
+          "productIds": [
+            {%- for collection_product in offer_collection.products -%}
+              {{ collection_product.id }}{% unless forloop.last %},{% endunless %}
+            {%- endfor -%}
+          ],
+          "suggestions": [
+            {%- assign suggestion_count = 0 -%}
+            {%- for collection_product in offer_collection.products -%}
+              {%- if collection_product.id != product.id and collection_product.available and collection_product.price > 0 and suggestion_count < 2 -%}
+                {%- assign suggestion_variant = collection_product.selected_or_first_available_variant -%}
+                {%- if suggestion_count > 0 %},{% endif -%}
+                {
+                  "productId": {{ collection_product.id }},
+                  "variantId": {{ suggestion_variant.id }},
+                  "title": {{ collection_product.title | json }},
+                  "variantTitle": {% if collection_product.has_only_default_variant %}null{% else %}{{ suggestion_variant.title | json }}{% endif %},
+                  "price": {{ suggestion_variant.price }},
+                  "url": {{ collection_product.url | json }},
+                  "image": {% if collection_product.featured_image %}{{ collection_product.featured_image | image_url: width: 160 | json }}{% else %}null{% endif %}
+                }
+                {%- assign suggestion_count = suggestion_count | plus: 1 -%}
+              {%- endif -%}
+            {%- endfor -%}
+          ]
+        }
+      {%- elsif offer_type == 'bundle' -%}
+        ,
+        "bundle": {
+          "percentOne": 10,
+          "percentTwo": 15,
+          "codeOne": "APB-SET10-{{ product.id }}",
+          "codeTwo": "APB-SET15-{{ product.id }}",
+          "partners": [
+            {%- for partner in bundle_partners limit: 2 -%}
+              {%- assign partner_variant = partner.selected_or_first_available_variant -%}
+              {
+                "productId": {{ partner.id }},
+                "variantId": {{ partner_variant.id }},
+                "title": {{ partner.title | json }},
+                "variantTitle": {% if partner.has_only_default_variant %}null{% else %}{{ partner_variant.title | json }}{% endif %},
+                "price": {{ partner_variant.price }},
+                "available": {{ partner_variant.available | json }},
+                "url": {{ partner.url | json }},
+                "image": {% if partner.featured_image %}{{ partner.featured_image | image_url: width: 160 | json }}{% else %}null{% endif %}
+              }{% unless forloop.last %},{% endunless %}
+            {%- endfor -%}
+          ]
+        }
+      {%- endif %}
+    }
+  </script>
+{%- endif -%}
