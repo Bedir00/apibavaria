@@ -1,0 +1,919 @@
+{% comment %}
+  Section contract.
+  Product-specific story below the buy box. Every part is driven by product metafields in
+  the `apb` namespace, so each product page gets its own composition: claim and intro
+  (apb.claim, apb.einleitung), hive-system fit (apb.beutensysteme), key figures
+  (apb.kennzahlen "Wert | Beschriftung"), usage steps (apb.anwendung "Schritt | Text"),
+  season calendar (apb.einsatzmonate, apb.einsatz_hinweis), curated accessories
+  (apb.zubehoer) and FAQ (apb.faq "Frage | Antwort"). Parts without data are skipped.
+  Colours and the outlined motif follow the product type (feed, foundation, frames,
+  jars, tools).
+  @example
+  <!-- templates/product.json: section "apb_story" directly after "main" -->
+{% endcomment %}
+
+{%- liquid
+  assign apb = product.metafields.apb
+  assign story_claim = apb.claim.value
+  assign story_intro = apb.einleitung.value
+  assign story_systems = apb.beutensysteme.value
+  assign story_facts = apb.kennzahlen.value
+  assign story_steps = apb.anwendung.value
+  assign story_months = apb.einsatzmonate.value
+  assign story_month_hint = apb.einsatz_hinweis.value
+  assign story_related = apb.zubehoer.value
+  assign story_faq = apb.faq.value
+
+  case product.type
+    when 'Bienenfütterung'
+      assign story_theme = 'futter'
+    when 'Mittelwände'
+      assign story_theme = 'wachs'
+    when 'Rähmchen'
+      assign story_theme = 'holz'
+    when 'Gläser'
+      assign story_theme = 'glas'
+    else
+      assign story_theme = 'werkzeug'
+  endcase
+
+  assign all_systems = 'Zander,Liebig,Deutsch Normal,Dadant,Dadant Blatt,Langstroth' | split: ','
+  assign month_keys = 'Jan,Feb,Mär,Apr,Mai,Jun,Jul,Aug,Sep,Okt,Nov,Dez' | split: ','
+  assign month_names = 'Januar,Februar,März,April,Mai,Juni,Juli,August,September,Oktober,November,Dezember' | split: ','
+
+  assign story_universal = false
+  if story_systems contains 'Systemunabhängig'
+    assign story_universal = true
+  endif
+
+  assign has_story_image = false
+  if product.media.size > 1 and product.media[1].media_type == 'image'
+    assign has_story_image = true
+    assign story_image = product.media[1]
+  endif
+
+  assign heading_id = 'apb-story-title-' | append: section.id
+-%}
+
+<section
+  class="apb-story apb-story--{{ story_theme }}"
+  {% if story_claim != blank %}
+    aria-labelledby="{{ heading_id }}"
+  {% else %}
+    aria-label="Produktdetails"
+  {% endif %}
+>
+  {%- if story_claim != blank -%}
+    <div class="apb-story__intro">
+      <div class="apb-story__intro-copy" data-apb-reveal>
+        {%- if product.type != blank -%}
+          <p class="apb-story__kicker">{{ product.type | escape }}</p>
+        {%- endif -%}
+        <h2 id="{{ heading_id }}" class="apb-story__claim">{{ story_claim | escape }}</h2>
+        {%- if story_intro != blank -%}
+          <p class="apb-story__lead">{{ story_intro | escape | newline_to_br }}</p>
+        {%- endif -%}
+
+        {%- if story_systems != blank -%}
+          <div class="apb-story__fit">
+            <p class="apb-story__label">{{ section.settings.fit_heading | escape }}</p>
+            {%- if story_universal -%}
+              <p class="apb-story__fit-universal">Unabhängig vom Beutensystem einsetzbar.</p>
+            {%- else -%}
+              <ul class="apb-story__systems">
+                {%- for system in all_systems -%}
+                  {%- liquid
+                    assign system_active = false
+                    if story_systems contains system
+                      assign system_active = true
+                    endif
+                  -%}
+                  <li class="apb-story__system{% if system_active %} is-active{% endif %}">
+                    {{ system }}
+                    <span class="apb-sr">
+                      {%- if system_active %} – passt{% else %} – passt nicht{% endif -%}
+                    </span>
+                  </li>
+                {%- endfor -%}
+              </ul>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+      </div>
+
+      <div class="apb-story__visual{% unless has_story_image %} apb-story__visual--motif{% endunless %}" data-apb-reveal data-apb-draw>
+        {%- if has_story_image -%}
+          {%- assign story_image_alt = story_image.alt | default: product.title -%}
+          {{
+            story_image.preview_image
+            | image_url: width: 1200
+            | image_tag:
+              class: 'apb-story__image',
+              loading: 'lazy',
+              widths: '400, 600, 800, 1000, 1200',
+              sizes: '(min-width: 990px) 45vw, 100vw',
+              alt: story_image_alt
+          }}
+        {%- endif -%}
+        <div class="apb-story__motif">
+          {% render 'apibavaria-pdp-motif', motif: story_theme %}
+        </div>
+      </div>
+    </div>
+  {%- endif -%}
+
+  {%- if section.settings.show_facts and story_facts != blank -%}
+    <dl class="apb-story__facts">
+      {%- for fact in story_facts -%}
+        {%- assign fact_parts = fact | split: '|' -%}
+        <div class="apb-story__fact" data-apb-reveal>
+          <dt>{% if fact_parts.size > 1 %}{{ fact_parts.last | strip | escape }}{% endif %}</dt>
+          <dd>{{ fact_parts.first | strip | escape }}</dd>
+        </div>
+      {%- endfor -%}
+    </dl>
+  {%- endif -%}
+
+  {%- if section.settings.show_steps and story_steps != blank -%}
+    <div class="apb-story__block">
+      <header class="apb-story__block-header" data-apb-reveal>
+        <p class="apb-story__label">Anwendung</p>
+        <h2 class="apb-story__heading">{{ section.settings.steps_heading | escape }}</h2>
+      </header>
+      <ol class="apb-story__steps">
+        {%- for step in story_steps -%}
+          {%- assign step_parts = step | split: '|' -%}
+          <li class="apb-story__step" data-apb-reveal>
+            <span class="apb-story__step-number" aria-hidden="true">{{ forloop.index | prepend: '0' | slice: -2, 2 }}</span>
+            <h3>{{ step_parts.first | strip | escape }}</h3>
+            {%- if step_parts.size > 1 -%}
+              <p>{{ step_parts.last | strip | escape }}</p>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ol>
+    </div>
+  {%- endif -%}
+
+  {%- if section.settings.show_calendar and story_months != blank -%}
+    <div class="apb-story__block apb-story__block--calendar">
+      <header class="apb-story__block-header" data-apb-reveal>
+        <p class="apb-story__label">Bienenjahr</p>
+        <h2 class="apb-story__heading">{{ section.settings.calendar_heading | escape }}</h2>
+      </header>
+      <ol class="apb-story__months" data-apb-reveal>
+        {%- for month in month_keys -%}
+          {%- liquid
+            assign month_active = false
+            if story_months contains month
+              assign month_active = true
+            endif
+          -%}
+          <li class="apb-story__month{% if month_active %} is-active{% endif %}" style="--apb-month: {{ forloop.index0 }};">
+            <abbr title="{{ month_names[forloop.index0] }}">{{ month }}</abbr>
+            {%- if month_active -%}
+              <span class="apb-sr"> – Einsatzmonat</span>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ol>
+      {%- if story_month_hint != blank -%}
+        <p class="apb-story__hint" data-apb-reveal>{{ story_month_hint | escape }}</p>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
+  {%- if section.settings.show_related and story_related != blank -%}
+    <div class="apb-story__block">
+      <header class="apb-story__block-header" data-apb-reveal>
+        <p class="apb-story__label">Zubehör</p>
+        <h2 class="apb-story__heading">{{ section.settings.related_heading | escape }}</h2>
+      </header>
+      <ul class="apb-story__related">
+        {%- for related in story_related limit: 3 -%}
+          <li class="apb-story__related-item" data-apb-reveal>
+            <a class="apb-story__related-link" href="{{ related.url }}">
+              <span class="apb-story__related-media">
+                {%- if related.featured_image -%}
+                  {{
+                    related.featured_image
+                    | image_url: width: 400
+                    | image_tag: loading: 'lazy', widths: '160, 240, 320, 400', sizes: '(min-width: 750px) 120px, 88px', alt: ''
+                  }}
+                {%- else -%}
+                  {% render 'apibavaria-pdp-motif', motif: story_theme %}
+                {%- endif -%}
+              </span>
+              <span class="apb-story__related-copy">
+                <span class="apb-story__related-title">{{ related.title | escape }}</span>
+                <span class="apb-story__related-price">
+                  {%- if related.available -%}
+                    {{ related.price | money }}
+                  {%- else -%}
+                    Derzeit nicht verfügbar
+                  {%- endif -%}
+                </span>
+              </span>
+              <span class="apb-story__related-arrow" aria-hidden="true">→</span>
+            </a>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </div>
+  {%- endif -%}
+
+  {%- if section.settings.show_faq -%}
+    <div class="apb-story__block apb-story__block--faq">
+      <header class="apb-story__block-header" data-apb-reveal>
+        <p class="apb-story__label">Fragen</p>
+        <h2 class="apb-story__heading">{{ section.settings.faq_heading | escape }}</h2>
+      </header>
+      <div class="apb-story__faq" data-apb-reveal>
+        {%- if story_faq != blank -%}
+          {%- for entry in story_faq -%}
+            {%- assign faq_parts = entry | split: '|' -%}
+            <details class="apb-story__question">
+              <summary><span>{{ faq_parts.first | strip | escape }}</span><span class="apb-story__toggle" aria-hidden="true"></span></summary>
+              {%- if faq_parts.size > 1 -%}
+                <p>{{ faq_parts.last | strip | escape }}</p>
+              {%- endif -%}
+            </details>
+          {%- endfor -%}
+        {%- else -%}
+          <details class="apb-story__question">
+            <summary><span>Wann wird meine Bestellung geliefert?</span><span class="apb-story__toggle" aria-hidden="true"></span></summary>
+            <p>Die Lieferzeit beträgt in der Regel 2–4 Werktage.</p>
+          </details>
+          <details class="apb-story__question">
+            <summary><span>Wie prüfe ich die Kompatibilität?</span><span class="apb-story__toggle" aria-hidden="true"></span></summary>
+            <p>Bitte gleiche Maß, Beutensystem und Packungsgröße im Produkttitel sowie in den technischen Details ab.</p>
+          </details>
+        {%- endif -%}
+      </div>
+    </div>
+  {%- endif -%}
+</section>
+
+{% stylesheet %}
+  .apb-story {
+    --apb-ink: #3f4a1f;
+    --apb-muted: #5f6c39;
+    --apb-line: #d7debb;
+    --apb-accent: #56662a;
+    --apb-accent-soft: #a1ad78;
+    --apb-tint: #f5f7ec;
+
+    width: min(100% - 32px, 1200px);
+    margin: clamp(40px, 6vw, 88px) auto clamp(48px, 6vw, 80px);
+    color: var(--apb-ink);
+  }
+
+  .apb-story *,
+  .apb-story *::before,
+  .apb-story *::after {
+    box-sizing: border-box;
+  }
+
+  .apb-story--futter {
+    --apb-accent: #a86f00;
+    --apb-accent-soft: #e2b13c;
+    --apb-tint: #fbf3df;
+    --apb-line: #ecdcb1;
+  }
+
+  .apb-story--wachs {
+    --apb-accent: #8a6a0c;
+    --apb-accent-soft: #d9b44a;
+    --apb-tint: #f7f0d6;
+    --apb-line: #e6d9a8;
+  }
+
+  .apb-story--holz {
+    --apb-accent: #7a4f26;
+    --apb-accent-soft: #c49a6c;
+    --apb-tint: #f4ece2;
+    --apb-line: #e2d2bf;
+  }
+
+  .apb-story--glas {
+    --apb-accent: #2f6b63;
+    --apb-accent-soft: #8fbcb4;
+    --apb-tint: #eaf3f1;
+    --apb-line: #c9ddd8;
+  }
+
+  .apb-sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .apb-story__label,
+  .apb-story__kicker {
+    margin: 0 0 10px;
+    color: var(--apb-accent);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  /* Intro */
+  .apb-story__intro {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    border: 1px solid var(--apb-line);
+    background: var(--apb-tint);
+  }
+
+  .apb-story__intro-copy {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+    padding: clamp(28px, 4.5vw, 64px);
+  }
+
+  .apb-story__claim {
+    margin: 0;
+    color: var(--apb-ink);
+    font-size: clamp(1.7rem, 3.2vw, 2.9rem);
+    line-height: 1.02;
+    letter-spacing: -0.045em;
+    overflow-wrap: anywhere;
+  }
+
+  .apb-story__lead {
+    max-width: 52ch;
+    margin: 18px 0 0;
+    color: var(--apb-muted);
+    font-size: 0.9rem;
+    line-height: 1.65;
+  }
+
+  .apb-story__fit {
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid var(--apb-line);
+  }
+
+  .apb-story__systems {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .apb-story__system {
+    padding: 6px 10px;
+    border: 1px solid var(--apb-line);
+    color: rgb(63 74 31 / 0.45);
+    font-size: 0.74rem;
+    font-weight: 600;
+  }
+
+  .apb-story__system.is-active {
+    border-color: var(--apb-ink);
+    background: var(--apb-ink);
+    color: #fff;
+  }
+
+  .apb-story__fit-universal {
+    margin: 0;
+    font-size: 0.86rem;
+    font-weight: 600;
+  }
+
+  .apb-story__visual {
+    position: relative;
+    min-height: 320px;
+    overflow: hidden;
+    border-inline-start: 1px solid var(--apb-line);
+    background: #fff;
+  }
+
+  .apb-story__image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: clamp(16px, 3vw, 40px);
+  }
+
+  .apb-story__motif {
+    position: absolute;
+    inset-block-end: 16px;
+    inset-inline-end: 16px;
+    width: 64px;
+    height: 64px;
+    padding: 12px;
+    background: var(--apb-tint);
+    color: var(--apb-accent);
+  }
+
+  .apb-story__visual--motif {
+    display: grid;
+    place-items: center;
+    background: #fff;
+  }
+
+  .apb-story__visual--motif .apb-story__motif {
+    position: static;
+    width: min(46%, 220px);
+    height: auto;
+    aspect-ratio: 1;
+    padding: 0;
+    background: none;
+  }
+
+  .apb-motif {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Key figures */
+  .apb-story__facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    margin: 0;
+    border-inline: 1px solid var(--apb-line);
+    border-block-end: 1px solid var(--apb-line);
+  }
+
+  .apb-story__fact {
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: flex-end;
+    gap: 6px;
+    min-width: 0;
+    padding: clamp(18px, 2.4vw, 28px);
+    border-inline-end: 1px solid var(--apb-line);
+  }
+
+  .apb-story__fact:last-child {
+    border-inline-end: 0;
+  }
+
+  .apb-story__fact dd {
+    margin: 0;
+    color: var(--apb-accent);
+    font-size: clamp(1.25rem, 2.2vw, 1.9rem);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+  }
+
+  .apb-story__fact dt {
+    color: var(--apb-muted);
+    font-size: 0.74rem;
+    font-weight: 600;
+  }
+
+  /* Blocks */
+  .apb-story__block {
+    margin-top: clamp(48px, 6vw, 80px);
+  }
+
+  .apb-story__block-header {
+    margin-bottom: 20px;
+  }
+
+  .apb-story__heading {
+    margin: 0;
+    font-size: clamp(1.4rem, 2.4vw, 2.1rem);
+    line-height: 1.05;
+    letter-spacing: -0.04em;
+  }
+
+  /* Steps */
+  .apb-story__steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .apb-story__step {
+    position: relative;
+    min-width: 0;
+    padding: 24px 22px 26px;
+    border: 1px solid var(--apb-line);
+    background: #fff;
+  }
+
+  .apb-story__step::before {
+    position: absolute;
+    inset: -1px -1px auto;
+    height: 3px;
+    background: var(--apb-accent-soft);
+    content: "";
+  }
+
+  .apb-story__step-number {
+    display: block;
+    margin-bottom: 18px;
+    color: var(--apb-accent);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .apb-story__step h3 {
+    margin: 0 0 8px;
+    font-size: 1rem;
+    letter-spacing: -0.02em;
+  }
+
+  .apb-story__step p {
+    margin: 0;
+    color: var(--apb-muted);
+    font-size: 0.82rem;
+    line-height: 1.6;
+  }
+
+  /* Season calendar */
+  .apb-story__months {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    margin: 0;
+    padding: 0;
+    border: 1px solid var(--apb-line);
+    list-style: none;
+  }
+
+  .apb-story__month {
+    position: relative;
+    display: grid;
+    min-height: 72px;
+    place-items: end center;
+    padding: 0 2px 12px;
+    border-inline-end: 1px solid var(--apb-line);
+    color: rgb(63 74 31 / 0.45);
+    font-size: 0.72rem;
+    font-weight: 600;
+  }
+
+  .apb-story__month:last-child {
+    border-inline-end: 0;
+  }
+
+  .apb-story__month abbr {
+    text-decoration: none;
+  }
+
+  .apb-story__month.is-active {
+    background: var(--apb-tint);
+    color: var(--apb-ink);
+  }
+
+  .apb-story__month.is-active::before {
+    position: absolute;
+    inset: 0 0 auto;
+    height: 38%;
+    background: var(--apb-accent-soft);
+    content: "";
+  }
+
+  .apb-story__hint {
+    max-width: 70ch;
+    margin: 14px 0 0;
+    color: var(--apb-muted);
+    font-size: 0.82rem;
+    line-height: 1.6;
+  }
+
+  /* Related */
+  .apb-story__related {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .apb-story__related-link {
+    display: grid;
+    grid-template-columns: 88px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 16px;
+    height: 100%;
+    padding: 12px 18px 12px 12px;
+    border: 1px solid var(--apb-line);
+    background: #fff;
+    color: inherit;
+    text-decoration: none;
+    transition: border-color var(--animation-speed-slow, 0.2s) ease;
+  }
+
+  .apb-story__related-link:hover {
+    border-color: var(--apb-accent);
+  }
+
+  .apb-story__related-link:focus-visible {
+    outline: 3px solid var(--apb-accent-soft);
+    outline-offset: 2px;
+  }
+
+  .apb-story__related-media {
+    display: block;
+    aspect-ratio: 1;
+    padding: 6px;
+    background: var(--apb-tint);
+    color: var(--apb-accent);
+  }
+
+  .apb-story__related-media img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .apb-story__related-copy {
+    display: grid;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  .apb-story__related-title {
+    font-size: 0.84rem;
+    font-weight: 600;
+    line-height: 1.35;
+  }
+
+  .apb-story__related-price {
+    color: var(--apb-muted);
+    font-size: 0.8rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .apb-story__related-arrow {
+    color: var(--apb-accent);
+    transition: transform var(--animation-speed-slow, 0.2s) var(--ease-out-cubic, ease);
+  }
+
+  .apb-story__related-link:hover .apb-story__related-arrow {
+    transform: translateX(4px);
+  }
+
+  /* FAQ */
+  .apb-story__block--faq {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.6fr);
+    gap: clamp(20px, 4vw, 64px);
+    align-items: start;
+  }
+
+  .apb-story__faq {
+    border-top: 1px solid var(--apb-line);
+  }
+
+  .apb-story__question {
+    border-bottom: 1px solid var(--apb-line);
+  }
+
+  .apb-story__question summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 2px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    list-style: none;
+  }
+
+  .apb-story__question summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .apb-story__question summary:focus-visible {
+    outline: 3px solid var(--apb-accent-soft);
+    outline-offset: 2px;
+  }
+
+  .apb-story__toggle {
+    position: relative;
+    flex: 0 0 14px;
+    width: 14px;
+    height: 14px;
+  }
+
+  .apb-story__toggle::before,
+  .apb-story__toggle::after {
+    position: absolute;
+    inset: 6px 0 auto;
+    height: 2px;
+    background: var(--apb-accent);
+    content: "";
+    transition: transform var(--animation-speed-slow, 0.2s) ease;
+  }
+
+  .apb-story__toggle::after {
+    transform: rotate(90deg);
+  }
+
+  .apb-story__question[open] .apb-story__toggle::after {
+    transform: rotate(0deg);
+  }
+
+  .apb-story__question p {
+    max-width: 68ch;
+    margin: 0;
+    padding: 0 2px 20px;
+    color: var(--apb-muted);
+    font-size: 0.86rem;
+    line-height: 1.65;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .apb-story__months .apb-story__month.is-active::before {
+      transform-origin: top;
+      animation: apb-story-month 0.7s var(--ease-out-cubic, ease) both;
+      animation-delay: calc(var(--apb-month) * 50ms);
+    }
+
+    .apb-story__months.apb-reveal:not(.is-revealed) .apb-story__month.is-active::before {
+      animation-play-state: paused;
+    }
+  }
+
+  @keyframes apb-story-month {
+    from {
+      transform: scaleY(0);
+    }
+  }
+
+  @media (max-width: 989px) {
+    .apb-story__intro {
+      grid-template-columns: 1fr;
+    }
+
+    .apb-story__visual {
+      min-height: 260px;
+      border-inline-start: 0;
+      border-block-start: 1px solid var(--apb-line);
+    }
+
+    .apb-story__block--faq {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+
+    .apb-story__facts {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .apb-story__fact:nth-child(2n) {
+      border-inline-end: 0;
+    }
+
+    .apb-story__fact:nth-child(n + 3) {
+      border-block-start: 1px solid var(--apb-line);
+    }
+  }
+
+  @media (max-width: 749px) {
+    .apb-story {
+      width: min(100% - 24px, 1200px);
+    }
+
+    .apb-story__intro-copy {
+      padding: 24px 18px;
+    }
+
+    .apb-story__months {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+
+    .apb-story__month {
+      min-height: 60px;
+    }
+
+    .apb-story__month:nth-child(6) {
+      border-inline-end: 0;
+    }
+
+    .apb-story__month:nth-child(n + 7) {
+      border-block-start: 1px solid var(--apb-line);
+    }
+
+    .apb-story__related-link {
+      grid-template-columns: 72px minmax(0, 1fr) auto;
+      gap: 12px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .apb-story__related-link,
+    .apb-story__related-arrow,
+    .apb-story__toggle::before,
+    .apb-story__toggle::after {
+      transition: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "API Bavaria Produktstory",
+  "tag": "div",
+  "class": "apb-story-section",
+  "enabled_on": {
+    "templates": ["product"]
+  },
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Alle Inhalte kommen aus den Produkt-Metafeldern „PDP: …“. Bereiche ohne Daten werden automatisch ausgeblendet."
+    },
+    {
+      "type": "text",
+      "id": "fit_heading",
+      "label": "Überschrift Beutensysteme",
+      "default": "Passt zu"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_facts",
+      "label": "Kennzahlen anzeigen",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_steps",
+      "label": "Anwendungsschritte anzeigen",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "steps_heading",
+      "label": "Überschrift Anwendung",
+      "default": "So setzt du es ein",
+      "visible_if": "{{ section.settings.show_steps }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_calendar",
+      "label": "Einsatzkalender anzeigen",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "calendar_heading",
+      "label": "Überschrift Einsatzkalender",
+      "default": "Wann im Bienenjahr?",
+      "visible_if": "{{ section.settings.show_calendar }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_related",
+      "label": "Passendes Zubehör anzeigen",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "related_heading",
+      "label": "Überschrift Zubehör",
+      "default": "Das passt dazu",
+      "visible_if": "{{ section.settings.show_related }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_faq",
+      "label": "Fragen und Antworten anzeigen",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "faq_heading",
+      "label": "Überschrift FAQ",
+      "default": "Häufige Fragen",
+      "visible_if": "{{ section.settings.show_faq }}"
+    }
+  ],
+  "presets": [
+    {
+      "name": "API Bavaria Produktstory"
+    }
+  ]
+}
+{% endschema %}

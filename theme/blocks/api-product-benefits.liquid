@@ -1,0 +1,90 @@
+{%- doc -%}
+  Short benefit list under the product title. Reads the product metafield
+  `apb.vorteile` (list of single-line text); without it, the first sentences of the
+  product description are used.
+{%- enddoc -%}
+
+{% liquid
+  assign product_resource = closest.product
+  assign benefit_list = product_resource.metafields.apb.vorteile.value
+  assign benefit_text = ''
+
+  if benefit_list != blank
+    assign benefit_text = benefit_list | join: '|'
+    assign description_points = benefit_list
+  else
+    assign clean_description = product_resource.description | strip_html | replace: '&nbsp;', ' ' | strip
+    assign description_points = clean_description | replace: ';', '.' | split: '.'
+  endif
+%}
+
+<ul class="api-product-benefits" aria-label="Produktvorteile" {{ block.shopify_attributes }}>
+  {% assign rendered_points = 0 %}
+  {% for point in description_points %}
+    {% assign clean_point = point | strip %}
+    {% if clean_point != blank and rendered_points < 4 %}
+      <li>
+        <span class="api-product-benefits__check" aria-hidden="true">✓</span>
+        <span>
+          {% if benefit_text == blank %}
+            {{ clean_point | truncatewords: 6 }}
+          {% else %}
+            {{ clean_point }}
+          {% endif %}
+        </span>
+      </li>
+      {% assign rendered_points = rendered_points | plus: 1 %}
+    {% endif %}
+  {% endfor %}
+  {% if rendered_points == 0 %}
+    <li><span class="api-product-benefits__check" aria-hidden="true">✓</span><span>Ausgewählter Imkereibedarf</span></li>
+  {% endif %}
+</ul>
+
+{% stylesheet %}
+  .api-product-benefits {
+    display: grid;
+    gap: 4px;
+    width: 100%;
+    margin: 2px 0 0;
+    padding: 0;
+    list-style: none;
+    color: rgb(var(--color-foreground-rgb));
+    font-size: 0.7rem;
+    line-height: 1.2;
+    font-weight: 600;
+  }
+  .api-product-benefits li {
+    display: grid;
+    grid-template-columns: 14px 1fr;
+    gap: 6px;
+    align-items: start;
+  }
+  .api-product-benefits__check {
+    display: inline-grid;
+    place-items: center;
+    width: 12px;
+    height: 12px;
+    margin-top: 1px;
+    border-radius: 0;
+    background: #2f6b45;
+    color: #fff;
+    font-size: 8px;
+    font-weight: 700;
+    line-height: 1;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Produktvorteile",
+  "tag": null,
+  "settings": [],
+  "presets": [
+    {
+      "name": "Produktvorteile",
+      "category": "Produkt"
+    }
+  ]
+}
+{% endschema %}

@@ -39,10 +39,48 @@ Geänderte Theme-Dateien:
 - Kein zusätzliches Framework. Die Grafik ist Inline-SVG (keine Bild- oder Videodateien),
   dazu kommen rund 5 KB JavaScript und 3 KB CSS.
 
+## Produktseiten (PDP)
+
+Jede Produktseite baut sich aus eigenen Produktdaten auf und sieht deshalb für jedes
+Produkt anders aus. Die Inhalte liegen in Produkt-Metafeldern (Namespace `apb`). Du
+pflegst sie im Shopify-Admin unter *Produkt > Metafelder*, alle Felder beginnen mit „PDP:“.
+
+| Metafeld | Format | Wo es erscheint |
+| --- | --- | --- |
+| PDP: Vorteile (Buy-Box) `apb.vorteile` | Liste | Häkchen-Liste unter dem Titel |
+| PDP: Passt zu Beutensystem `apb.beutensysteme` | Auswahl | „Passt zu“-Chips in der Buy-Box und Systemleiste in der Story |
+| PDP: Story-Überschrift `apb.claim` | Text | Große Überschrift der Produktstory |
+| PDP: Story-Einleitung `apb.einleitung` | Mehrzeilig | Einleitungstext |
+| PDP: Kennzahlen `apb.kennzahlen` | `Wert \| Beschriftung` | Kennzahlen-Leiste |
+| PDP: Anwendungsschritte `apb.anwendung` | `Schritt \| Erklärung` | „So setzt du es ein“ |
+| PDP: Einsatzmonate `apb.einsatzmonate` | Auswahl Jan–Dez | Kalender „Wann im Bienenjahr?“ |
+| PDP: Hinweis Einsatzkalender `apb.einsatz_hinweis` | Text | Satz unter dem Kalender |
+| PDP: Technische Daten `apb.technische_daten` | `Merkmal \| Wert` | Akkordeon in der Buy-Box |
+| PDP: Lieferumfang `apb.lieferumfang` | Liste | Akkordeon in der Buy-Box |
+| PDP: Fragen und Antworten `apb.faq` | `Frage \| Antwort` | „Häufige Fragen“ |
+| PDP: Passendes Zubehör `apb.zubehoer` | Produkte | „Das passt dazu“ (max. 3) |
+
+Bereiche ohne Daten werden automatisch ausgeblendet. Farbwelt und Linien-Motiv richten
+sich nach dem Produkttyp: Bienenfütterung = Honig, Mittelwände = Wachs, Rähmchen =
+Holz, Gläser = Glas, alles andere = Grün.
+
+Theme-Dateien:
+
+- `sections/apibavaria-pdp-story.liquid`: neue Sektion „API Bavaria Produktstory“ unter der Buy-Box
+- `blocks/api-pdp-fit.liquid`: neuer Block „Passt zu (Beutensystem)“ in der Buy-Box
+- `blocks/api-product-benefits.liquid`: Vorteile kommen aus `apb.vorteile` statt aus einer festen Liste im Code
+- `blocks/api-pdp-details.liquid`: Lieferumfang und Technische Daten aus den Metafeldern, FAQ abschaltbar
+- `snippets/apibavaria-pdp-motif.liquid`: Linien-Motive je Kategorie
+- `templates/product.json`: „Passt zu“ nach dem Titel, Produktstory nach der Buy-Box
+
+Die Inhalte für alle 23 aktiven Produkte liegen in `content/pdp_content.py`. Sie
+stützen sich auf die Angaben in den Produktbeschreibungen.
+
 ## Installation
 
-Die Dateien sind bereits im unveröffentlichten Theme **„Apibavaria – Motion Graphics
-04.10.2026“** (Kopie des Live-Themes vom 04.10.2026) eingespielt. So geht es weiter:
+Alle Dateien (Motion Graphics und PDP) sind bereits im unveröffentlichten Theme
+**„Apibavaria – Motion Graphics 04.10.2026“** (Kopie des Live-Themes vom 04.10.2026)
+eingespielt. Die PDP-Metafelder sind direkt an den Produkten gespeichert. So geht es weiter:
 
 1. Shopify-Admin > Onlineshop > Themes > „Apibavaria – Motion Graphics 04.10.2026“ >
    **Vorschau**.

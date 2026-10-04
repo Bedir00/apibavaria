@@ -1,0 +1,209 @@
+{% liquid
+  assign product_resource = closest.product
+  assign current_variant = product_resource.selected_or_first_available_variant
+  assign delivery_contents = product_resource.metafields.custom.lieferumfang.value
+  assign technical_details = product_resource.metafields.custom.technische_details.value
+  assign faq_content = product_resource.metafields.custom.fragen_antworten.value
+  assign apb_delivery = product_resource.metafields.apb.lieferumfang.value
+  assign apb_specs = product_resource.metafields.apb.technische_daten.value
+%}
+
+<div class="api-pdp-details" {{ block.shopify_attributes }}>
+  {% if current_variant.available %}
+    <div class="api-delivery-promise">
+      <span class="api-delivery-promise__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M3 6.5h11v10H3zM14 10h3.4l3.1 3.2v3.3H14zM6.5 19a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM17.5 19a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <span><strong>Sofort verfügbar</strong> Lieferzeit: 2–4 Werktage</span>
+    </div>
+  {% endif %}
+
+  <div class="api-accordions">
+    <details>
+      <summary><span>Beschreibung</span><span aria-hidden="true">+</span></summary>
+      <div class="api-accordion-content rte">{{ product_resource.description }}</div>
+    </details>
+
+    <details>
+      <summary><span>Lieferumfang</span><span aria-hidden="true">+</span></summary>
+      <div class="api-accordion-content rte">
+        {% if apb_delivery != blank %}
+          <ul class="api-delivery-list">
+            {% for item in apb_delivery %}
+              <li>{{ item | escape }}</li>
+            {% endfor %}
+          </ul>
+        {% elsif delivery_contents != blank %}
+          {{ delivery_contents }}
+        {% else %}
+          <p>1 × {{ product_resource.title }}</p>
+          <p>Geliefert wird der im Produkttitel und in der gewählten Variante angegebene Packungsumfang.</p>
+        {% endif %}
+      </div>
+    </details>
+
+    <details>
+      <summary><span>Technische Details</span><span aria-hidden="true">+</span></summary>
+      <div class="api-accordion-content">
+        {% if apb_specs != blank %}
+          <dl class="api-tech-list">
+            {% for row in apb_specs %}
+              {% assign row_parts = row | split: '|' %}
+              <div><dt>{{ row_parts.first | strip | escape }}</dt><dd>{{ row_parts.last | strip | escape }}</dd></div>
+            {% endfor %}
+            {% if current_variant.sku != blank %}<div><dt>Artikelnummer</dt><dd>{{ current_variant.sku }}</dd></div>{% endif %}
+          </dl>
+        {% elsif technical_details != blank %}
+          <div class="rte">{{ technical_details }}</div>
+        {% else %}
+          <dl class="api-tech-list">
+            {% if product_resource.type != blank %}<div><dt>Kategorie</dt><dd>{{ product_resource.type }}</dd></div>{% endif %}
+            {% if product_resource.vendor != blank %}<div><dt>Hersteller</dt><dd>{{ product_resource.vendor }}</dd></div>{% endif %}
+            {% if current_variant.sku != blank %}<div><dt>Artikelnummer</dt><dd>{{ current_variant.sku }}</dd></div>{% endif %}
+            {% unless product_resource.has_only_default_variant %}
+              {% for option in product_resource.options_with_values %}
+                <div><dt>{{ option.name }}</dt><dd>{{ option.values | join: ', ' }}</dd></div>
+              {% endfor %}
+            {% endunless %}
+          </dl>
+        {% endif %}
+      </div>
+    </details>
+
+    {% if block.settings.show_faq %}
+    <details>
+      <summary><span>Fragen und Antworten</span><span aria-hidden="true">+</span></summary>
+      <div class="api-accordion-content rte">
+        {% if faq_content != blank %}
+          {{ faq_content }}
+        {% else %}
+          <p><strong>Wann wird meine Bestellung geliefert?</strong><br>Die Lieferzeit beträgt in der Regel 2–4 Werktage.</p>
+          <p><strong>Wie prüfe ich die Kompatibilität?</strong><br>Bitte gleiche Maß, Beutensystem und Packungsgröße im Produkttitel sowie in den technischen Details ab.</p>
+        {% endif %}
+      </div>
+    </details>
+    {% endif %}
+  </div>
+</div>
+
+{% stylesheet %}
+  .api-pdp-details {
+    width: 100%;
+    margin-top: -20px;
+  }
+  .api-delivery-promise {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 7px;
+    width: 100%;
+    margin: 0 auto 30px;
+    text-align: left;
+    color: #203c2d;
+    font-size: 0.7rem;
+    line-height: 1.3;
+  }
+  .api-delivery-promise__icon {
+    width: 18px;
+    height: 18px;
+    flex: 0 0 18px;
+  }
+  .api-delivery-promise__icon svg {
+    width: 100%;
+    height: 100%;
+  }
+  .api-accordions {
+    border-top: 1px solid rgba(var(--color-foreground-rgb), 0.18);
+  }
+  .api-accordions details {
+    border-bottom: 1px solid rgba(var(--color-foreground-rgb), 0.18);
+  }
+  .api-accordions summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 2px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    list-style: none;
+  }
+  .api-accordions summary::-webkit-details-marker { display: none; }
+  .api-accordions details[open] summary span:last-child { transform: rotate(45deg); }
+  .api-accordions summary span:last-child {
+    font-size: 1.25rem;
+    font-weight: 400;
+    transition: transform 180ms ease;
+  }
+  .api-accordion-content {
+    padding: 0 2px 18px;
+    font-size: 0.8rem;
+    line-height: 1.6;
+  }
+  .api-accordion-content > :first-child { margin-top: 0; }
+  .api-accordion-content > :last-child { margin-bottom: 0; }
+  .api-tech-list {
+    display: grid;
+    gap: 0;
+    margin: 0;
+  }
+  .api-tech-list > div {
+    display: grid;
+    grid-template-columns: minmax(110px, 0.8fr) 1.2fr;
+    gap: 16px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(var(--color-foreground-rgb), 0.1);
+  }
+  .api-tech-list > div:last-child { border-bottom: 0; }
+  .api-tech-list dt { font-weight: 600; }
+  .api-tech-list dd { margin: 0; }
+  .api-delivery-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .api-delivery-list li {
+    position: relative;
+    padding: 6px 0 6px 18px;
+    border-bottom: 1px solid rgba(var(--color-foreground-rgb), 0.1);
+  }
+  .api-delivery-list li:last-child { border-bottom: 0; }
+  .api-delivery-list li::before {
+    position: absolute;
+    top: 0.95em;
+    left: 2px;
+    width: 7px;
+    height: 7px;
+    background: #6b7d32;
+    content: "";
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Lieferung & Details",
+  "tag": null,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Lieferumfang und Technische Daten kommen aus den Produkt-Metafeldern apb.lieferumfang und apb.technische_daten."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_faq",
+      "label": "Fragen und Antworten anzeigen",
+      "info": "Auf der Produktseite stehen die FAQ in der Sektion „API Bavaria Produktstory“. Hier nur aktivieren, wenn die Sektion fehlt.",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "Lieferung & Details",
+      "category": "Produkt"
+    }
+  ]
+}
+{% endschema %}

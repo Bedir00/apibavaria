@@ -1,0 +1,47 @@
+{%- doc -%}
+  Renders the outlined category motif used on product pages: a honey drop for feed,
+  a honeycomb for foundation, a frame for frames, a jar for jars and a smoker for tools.
+  Decorative only (aria-hidden). Strokes use currentColor; inside an element with
+  `data-apb-reveal data-apb-draw` the motion layer draws them in.
+
+  @param {string} motif - 'futter', 'wachs', 'holz', 'glas' or 'werkzeug'
+
+  @example
+  {% render 'apibavaria-pdp-motif', motif: 'futter' %}
+{%- enddoc -%}
+
+<svg
+  class="apb-motif apb-motif--{{ motif }}"
+  viewBox="0 0 120 120"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="square"
+  stroke-linejoin="miter"
+  aria-hidden="true"
+  focusable="false"
+>
+  {%- case motif -%}
+    {%- when 'futter' -%}
+      <path d="M60 12C60 12 28 50 28 74a32 32 0 0 0 64 0C92 50 60 12 60 12Z"/>
+      <path d="M44 76a16 16 0 0 0 16 16"/>
+      <path d="M86 20h18M95 11v18"/>
+    {%- when 'wachs' -%}
+      <path d="M60 18 78 28.5v21L60 60 42 49.5v-21Z"/>
+      <path d="M42 49.5 60 60v21L42 91.5 24 81V60Z"/>
+      <path d="M78 49.5 96 60v21L78 91.5 60 81V60Z"/>
+    {%- when 'holz' -%}
+      <path d="M14 22h92M22 22v76h76V22"/>
+      <path d="M22 40h76M22 58h76M22 76h76"/>
+      <path d="M30 30v60M90 30v60"/>
+    {%- when 'glas' -%}
+      <path d="M36 16h48v14H36Z"/>
+      <path d="M40 30c-8 6-12 14-12 24v38c0 6 4 10 10 10h44c6 0 10-4 10-10V54c0-10-4-18-12-24"/>
+      <path d="M40 62h40v24H40Z"/>
+    {%- else -%}
+      <path d="M38 40h44v58H38Z"/>
+      <path d="M44 40c0-12 6-22 16-22s16 10 16 22"/>
+      <path d="M60 18V8M82 58h18l8 30H90"/>
+      <path d="M46 56h28M46 70h28M46 84h28"/>
+  {%- endcase -%}
+</svg>

@@ -1,0 +1,119 @@
+{%- doc -%}
+  "Passt zu" chips in the product buy box: the hive systems a product fits, read from the
+  product metafield `apb.beutensysteme` (list of single-line text with fixed choices).
+  Renders nothing when the metafield is empty.
+{%- enddoc -%}
+
+{%- liquid
+  assign product_resource = closest.product
+  assign fit_systems = product_resource.metafields.apb.beutensysteme.value
+-%}
+
+{%- if fit_systems != blank -%}
+  <div class="api-pdp-fit" {{ block.shopify_attributes }}>
+    <span class="api-pdp-fit__label">{{ block.settings.label | escape }}</span>
+    <ul class="api-pdp-fit__list">
+      {%- for system in fit_systems -%}
+        <li class="api-pdp-fit__chip{% if system == 'Systemunabhängig' %} api-pdp-fit__chip--universal{% endif %}">
+          <svg viewBox="0 0 12 12" aria-hidden="true" focusable="false">
+            <path d="M6 1 10.3 3.5v5L6 11 1.7 8.5v-5Z"/>
+          </svg>
+          {%- if system == 'Systemunabhängig' -%}
+            Alle Beutensysteme
+          {%- else -%}
+            {{ system | escape }}
+          {%- endif -%}
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+{%- else -%}
+  <div hidden shopify-block-empty {{ block.shopify_attributes }}></div>
+{%- endif -%}
+
+{% stylesheet %}
+  .api-pdp-fit {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+    width: 100%;
+    margin-top: 2px;
+  }
+
+  .api-pdp-fit:has(+ *) {
+    margin-bottom: 4px;
+  }
+
+  .api-pdp-fit__label {
+    color: rgb(var(--color-foreground-rgb) / 0.62);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .api-pdp-fit__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .api-pdp-fit__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 9px;
+    border: 1px solid #6b7d32;
+    background: #f5f7ec;
+    color: #3f4a1f;
+    font-size: 0.72rem;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .api-pdp-fit__chip svg {
+    width: 10px;
+    height: 10px;
+    fill: #6b7d32;
+  }
+
+  .api-pdp-fit__chip--universal {
+    border-color: rgb(var(--color-foreground-rgb) / 0.25);
+    background: transparent;
+  }
+
+  .api-pdp-fit__chip--universal svg {
+    fill: none;
+    stroke: #6b7d32;
+    stroke-width: 1.4;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Passt zu (Beutensystem)",
+  "tag": null,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Zeigt die Beutensysteme aus dem Produkt-Metafeld „Passt zu Beutensystem“ (apb.beutensysteme)."
+    },
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Beschriftung",
+      "default": "Passt zu"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Passt zu (Beutensystem)",
+      "category": "Produkt"
+    }
+  ]
+}
+{% endschema %}
