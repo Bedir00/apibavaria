@@ -1,0 +1,33 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "apibavaria_focus": {
+      "type": "apibavaria-home-focus",
+      "settings": {}
+    },
+    "apibavaria_motion_banner": {
+      "type": "apibavaria-motion-banner",
+      "settings": {
+        "scheme": "dark",
+        "show_bees": true,
+        "kicker": "Aus der Praxis für die Praxis",
+        "heading": "Imkereibedarf, der mitdenkt.",
+        "text": "<p>Ausgewählte Produkte für Fütterung, Wabenbau und Honigernte – zusammengestellt für den Einsatz am Bienenvolk.</p>",
+        "button_label": "Sortiment entdecken",
+        "button_link": "/collections/all"
+      }
+    }
+  },
+  "order": [
+    "apibavaria_focus",
+    "apibavaria_motion_banner"
+  ]
+}

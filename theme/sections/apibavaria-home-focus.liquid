@@ -1,0 +1,171 @@
+{% liquid
+  assign launch_handles = 'glaser,futterung,mittelwande' | split: ','
+  assign launch_product_count = collections['glaser'].products_count | plus: collections['futterung'].products_count | plus: collections['mittelwande'].products_count
+%}
+
+<main class="apbf" aria-labelledby="apbf-title">
+  <section class="apbf-hero">
+    {%- if settings.apb_motion_hero -%}
+      {% render 'apibavaria-motion-hive', variant: 'hero', bees: true, class: 'apbf-hero__hive' %}
+    {%- endif -%}
+    <div class="apbf-hero__copy">
+      <h1 id="apbf-title"><span>Dein Fachhandel für </span><span>Imkereibedarf</span></h1>
+    </div>
+    <img
+      class="apbf-hero__image"
+      src="https://cdn.shopify.com/s/files/1/0961/9842/6888/files/Imkereibedarf_Onlineshop_Hero_Bild.png?v=1788706645"
+      alt="Imker prüft eine Honigwabe am Bienenstand"
+      width="2048"
+      height="882"
+      fetchpriority="high"
+    >
+  </section>
+
+  <aside class="apbf-build-notice" aria-label="Information zum Sortiment">
+    <strong>Weitere Kategorien folgen!</strong>
+    <span>Wir sind aktuell im Aufbau.</span>
+  </aside>
+
+  <section class="apbf-categories" id="sortiment" aria-labelledby="apbf-categories-title">
+    <header class="apbf-heading">
+      <p class="apbf-kicker">Saisonal ausgewählt</p>
+      <h2 id="apbf-categories-title">Bereit für den Winter?</h2>
+    </header>
+
+    <div class="apbf-category-grid">
+      {% for handle in launch_handles %}
+        {% assign category = collections[handle] %}
+        <a class="apbf-category apbf-category--{{ forloop.index }}" href="{{ category.url }}">
+          <div class="apbf-category__top">
+            <span class="apbf-category__number">0{{ forloop.index }}</span>
+            <span class="apbf-category__count">API Bavaria</span>
+          </div>
+          <div class="apbf-category__visual" aria-hidden="true">
+            {% case handle %}
+              {% when 'glaser' %}
+                <img src="https://cdn.shopify.com/s/files/1/0961/9842/6888/files/Naturglas_Imkereibedarf_Kategoriebild.png?v=1788935025" alt="" loading="lazy" decoding="async" style="display:block;width:100%;height:100%;object-fit:cover;object-position:center;">
+              {% when 'futterung' %}
+                <img src="https://cdn.shopify.com/s/files/1/0961/9842/6888/files/Bienenfuetterung_Imkereibedarf_Kategoriebild.png?v=1788935027" alt="" loading="lazy" decoding="async" style="display:block;width:100%;height:100%;object-fit:cover;object-position:center;">
+              {% when 'mittelwande' %}
+                <img src="https://cdn.shopify.com/s/files/1/0961/9842/6888/files/Mittelwand_Zander_Imkereibedarf_Kategoriebild.png?v=1788935066" alt="" loading="lazy" decoding="async" style="display:block;width:100%;height:100%;object-fit:cover;object-position:center;">
+            {% endcase %}
+          </div>
+          <div class="apbf-category__copy">
+            <h3>{{ category.title }}</h3>
+            <p>
+              {% case handle %}
+                {% when 'glaser' %}Vom Bienenstock ins Glas – sauber, sicher und überzeugend.
+                {% when 'futterung' %}Für eine Versorgung, auf die du dich verlassen kannst.
+                {% when 'mittelwande' %}Die zuverlässige Grundlage für einen starken Aufbau.
+              {% endcase %}
+            </p>
+            <strong>Jetzt ansehen <span aria-hidden="true">→</span></strong>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  </section>
+
+  {% if launch_product_count > 0 %}
+    <section class="apbf-products" aria-labelledby="apbf-products-title">
+      <header class="apbf-heading apbf-heading--row">
+        <div><p class="apbf-kicker">Jetzt im Sortiment</p><h2 id="apbf-products-title">Bereit für deinen nächsten Einsatz.</h2></div>
+      </header>
+      <div class="apbf-product-grid">
+        {% for handle in launch_handles %}
+          {% assign category = collections[handle] %}
+          {% for product in category.products limit: 2 %}
+            {% assign product_alt = product.featured_image.alt | default: product.title %}
+            <article class="apbf-product">
+              <a class="apbf-product__image" href="{{ product.url }}">
+                {% if product.featured_image %}
+                  {{ product.featured_image | image_url: width: 800 | image_tag: loading: 'lazy', widths: '320, 480, 640, 800', sizes: '(min-width: 990px) 30vw, 48vw', alt: product_alt }}
+                {% else %}
+                  {{ 'product-1' | placeholder_svg_tag }}
+                {% endif %}
+              </a>
+              <div class="apbf-product__content">
+                <span>{{ category.title }}</span>
+                <h3><a href="{{ product.url }}">{{ product.title }}</a></h3>
+                <div><strong>{{ product.price | money }}</strong><a href="{{ product.url }}" aria-label="{{ product.title | escape }} ansehen">Ansehen →</a></div>
+              </div>
+            </article>
+          {% endfor %}
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+
+  <section class="apbf-trust" aria-label="API Bavaria">
+    <header class="apbf-trust__header">
+      <div class="apbf-trust__brand">
+        {% if settings.logo != blank %}
+          {{ settings.logo | image_url: width: 360 | image_tag: class: 'apbf-trust__logo', loading: 'lazy', alt: 'API Bavaria' }}
+        {% endif %}
+      </div>
+    </header>
+    <div class="apbf-trust__grid">
+      <article class="apbf-trust__item">
+        <svg viewBox="0 0 48 48" aria-hidden="true">
+          <path d="M39 9C25 10 14 17 12 29c-1 7 4 11 10 10 12-2 18-14 17-30Z"/>
+          <path d="M10 40c7-10 14-16 25-23"/>
+        </svg>
+        <h3>Verantwortungsvoll ausgewählt</h3>
+        <p>Imkereibedarf sollte Bienen, Natur und Arbeitsalltag gleichermaßen im Blick behalten. Deshalb setzen wir auf sinnvolle Lösungen statt unnötigen Schnickschnack.</p>
+      </article>
+      <article class="apbf-trust__item">
+        <svg viewBox="0 0 48 48" aria-hidden="true">
+          <path d="m24 6 5 4 7-1 3 6 6 3-2 7 2 7-6 3-3 6-7-1-5 4-5-4-7 1-3-6-6-3 2-7-2-7 6-3 3-6 7 1 5-4Z"/>
+          <path d="m16 25 5 5 11-12"/>
+        </svg>
+        <h3>Praxisgerechte Qualität</h3>
+        <p>Unser Sortiment orientiert sich am tatsächlichen Einsatz am Bienenvolk: klarer Nutzen, passende Ausführungen und Produkte, auf die du dich verlassen kannst.</p>
+      </article>
+      <article class="apbf-trust__item">
+        <svg viewBox="0 0 48 48" aria-hidden="true">
+          <path d="M8 12h32v24H8z"/>
+          <path d="M15 20h18M15 27h12"/>
+          <path d="m32 34 5 5"/>
+        </svg>
+        <h3>Klarheit vor dem Kauf</h3>
+        <p>Verständliche Angaben, nachvollziehbare Varianten und ehrliche Orientierung helfen dir, schneller das Richtige für deine Imkerei zu finden.</p>
+      </article>
+    </div>
+  </section>
+</main>
+
+{% stylesheet %}
+  .apbf{--green:#6b7d32;--dark:#3f4a1f;--sage:#e7ecd4;--mist:#f5f7ec;--line:#d7debb;--text:#5f6c39;background:#fff;color:var(--dark)}.apbf *{box-sizing:border-box}.apbf a{color:inherit;text-decoration:none}.apbf-hero,.apbf-intro,.apbf-categories,.apbf-products,.apbf-trust{width:min(100% - 32px,1420px);margin-inline:auto}.apbf-kicker{margin:0 0 12px;color:var(--green);font-size:.72rem;font-weight:750;letter-spacing:.14em;text-transform:uppercase}
+  .apbf-hero{position:relative;display:flex;min-height:clamp(340px,31vw,430px);align-items:center;margin-top:22px;margin-bottom:28px;overflow:hidden;border-radius:0;background:var(--mist)}.apbf-hero::after{position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,rgba(255,255,255,.99) 0%,rgba(255,255,255,.97) 37%,rgba(255,255,255,.72) 51%,rgba(255,255,255,0) 72%);content:""}.apbf-hero__image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center center}.apbf-hero__copy{position:relative;z-index:2;width:min(54%,680px);padding:clamp(28px,4vw,56px)}.apbf-hero__copy h1{margin:0;font-size:clamp(2.75rem,4.7vw,4.9rem);line-height:.9;letter-spacing:-.06em}.apbf-hero__copy h1 span{display:inline;white-space:nowrap}.apbf-hero__copy>p:not(.apbf-kicker){max-width:570px;margin:18px 0 0;color:var(--text);font-size:clamp(.92rem,1.1vw,1.06rem);line-height:1.55}.apbf-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}.apbf-button{display:inline-flex;min-height:46px;align-items:center;justify-content:center;padding:11px 19px;border:1px solid var(--green);border-radius:0;font-size:.84rem;font-weight:750}.apbf-button--solid{background:var(--green);color:#fff!important}.apbf-button--line{background:rgba(255,255,255,.86);color:var(--green)!important}.apbf-button:focus-visible,.apbf a:focus-visible{outline:3px solid #a1ad78;outline-offset:3px}
+  .apbf-intro{display:grid;grid-template-columns:1.1fr repeat(3,1fr);margin-bottom:clamp(70px,8vw,120px);border-block:1px solid var(--line)}.apbf-intro>*{padding:20px 18px;border-right:1px solid var(--line);font-size:.78rem}.apbf-intro>*:last-child{border-right:0}.apbf-intro strong{font-size:.9rem}.apbf-intro span{color:var(--text)}
+  .apbf-build-notice{display:flex;width:min(100% - 32px,1420px);min-height:48px;align-items:center;justify-content:center;gap:9px;margin:0 auto 28px;padding:12px 18px;border:1px solid var(--line);background:var(--sage);color:var(--dark);font-size:.8rem;line-height:1.4;text-align:center}.apbf-build-notice strong{font-weight:750}.apbf-build-notice span{color:var(--text)}
+  .apbf-categories{padding-bottom:clamp(72px,8vw,118px)}.apbf-heading{display:grid;grid-template-columns:1fr auto;align-items:end;margin-bottom:28px}.apbf-heading .apbf-kicker{grid-column:1/-1}.apbf-heading h2,.apbf-trust h2{margin:0;font-size:clamp(2.25rem,4vw,4.3rem);line-height:.95;letter-spacing:-.052em}.apbf-heading>p:last-child{max-width:390px;margin:0;color:var(--text);font-size:.86rem;line-height:1.55}
+  .apbf-category-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.apbf-category{display:flex;min-height:510px;flex-direction:column;justify-content:space-between;padding:24px;border:1px solid var(--line);border-radius:0;overflow:hidden;transition:transform .2s ease,border-color .2s ease}.apbf-category:hover{transform:translateY(-4px);border-color:#95a267}.apbf-category--1{background:#fff}.apbf-category--2{background:var(--mist)}.apbf-category--3{background:var(--sage)}.apbf-category__top{display:flex;justify-content:space-between;color:#7e8c56;font-size:.68rem;text-transform:uppercase;letter-spacing:.08em}.apbf-category__visual{display:grid;height:210px;place-items:center;overflow:hidden}.apbf-category__visual svg{width:min(62%,190px);fill:none;stroke:var(--green);stroke-linecap:square;stroke-linejoin:miter;stroke-width:2}.apbf-category__copy h3{margin:0;font-size:clamp(2rem,3vw,3.2rem);letter-spacing:-.045em}.apbf-category__copy p{min-height:3em;margin:12px 0 24px;color:var(--text);font-size:.86rem;line-height:1.55}.apbf-category__copy strong{display:flex;justify-content:space-between;padding-top:16px;border-top:1px solid var(--line);font-size:.78rem}
+  .apbf-products{padding-block:clamp(70px,8vw,116px);border-top:1px solid var(--line)}.apbf-product-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.apbf-product{overflow:hidden;border:1px solid var(--line);border-radius:0;background:#fff}.apbf-product__image{display:block;aspect-ratio:1.1;background:var(--mist)}.apbf-product__image img,.apbf-product__image svg{width:100%;height:100%;object-fit:contain;padding:7%}.apbf-product__content{padding:18px}.apbf-product__content>span{color:#7e8c56;font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em}.apbf-product h3{min-height:2.7em;margin:8px 0 18px;font-size:.9rem;line-height:1.4}.apbf-product__content>div{display:flex;justify-content:space-between;padding-top:14px;border-top:1px solid var(--line);font-size:.78rem}.apbf-product__content>div a{color:var(--green);font-weight:700}
+  .apbf-trust{margin-bottom:clamp(70px,8vw,110px);padding:clamp(38px,5vw,68px);border-radius:0;background:var(--dark);color:#fff}.apbf-trust__header{display:grid;grid-template-columns:1fr 1.5fr;align-items:end;gap:28px;margin-bottom:34px}.apbf-trust .apbf-kicker{color:#c6d29d}.apbf-trust h2{margin:0;font-size:clamp(2.25rem,4vw,4.3rem);line-height:.95;letter-spacing:-.052em}.apbf-trust__grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.apbf-trust__item{padding:clamp(22px,2.6vw,34px);border:1px solid rgba(215,226,220,.28);border-radius:0;background:rgba(255,255,255,.055)}.apbf-trust__item svg{width:42px;height:42px;margin-bottom:28px;fill:none;stroke:#cfdaa9;stroke-linecap:square;stroke-linejoin:miter;stroke-width:1.7}.apbf-trust__item h3{margin:0 0 12px;font-size:clamp(1.15rem,1.5vw,1.4rem);letter-spacing:-.025em}.apbf-trust__item p{margin:0;color:#dde5c4;font-size:.84rem;line-height:1.65}
+  @media(max-width:989px){.apbf-hero__copy{width:62%}.apbf-category-grid{grid-template-columns:1fr}.apbf-category{min-height:390px}.apbf-category__visual{height:150px}.apbf-product-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:749px){.apbf-build-notice{width:min(100% - 24px,1420px);flex-direction:column;gap:2px;padding:12px 14px}.apbf-hero,.apbf-categories,.apbf-products,.apbf-trust{width:min(100% - 24px,1420px)}.apbf-hero{display:grid;min-height:0;margin-top:12px;margin-bottom:38px;overflow:visible;border-radius:0;background:#fff}.apbf-hero::after{display:none}.apbf-hero__copy{width:100%;padding:22px 0 20px}.apbf-hero__copy h1{max-width:100%;font-size:clamp(1.8rem,8.8vw,2.45rem);line-height:1.02;letter-spacing:-.045em}.apbf-hero__copy h1 span{display:block;white-space:nowrap}.apbf-hero__image{position:relative;width:100%;height:auto;aspect-ratio:1.65/1;border-radius:0;object-fit:cover;object-position:center}.apbf-actions{display:grid}.apbf-heading{grid-template-columns:1fr;margin-bottom:22px}.apbf-heading h2,.apbf-trust h2{font-size:clamp(1.65rem,8vw,2.2rem);line-height:1.03}.apbf-category{min-height:330px;padding:18px}.apbf-category__visual{height:120px}.apbf-category__copy h3{font-size:1.6rem}.apbf-category__copy p{min-height:0;margin:9px 0 18px;font-size:.8rem}.apbf-product-grid{gap:8px}.apbf-product__content{padding:11px}.apbf-product h3{min-height:3.9em;margin:7px 0 12px;font-size:.76rem;line-height:1.3}.apbf-product__content>div{align-items:flex-end;gap:6px;font-size:.7rem}.apbf-trust{padding:30px 18px}.apbf-trust__header{grid-template-columns:1fr;gap:8px}.apbf-trust__grid{grid-template-columns:1fr}.apbf-trust__item{padding:22px 18px}.apbf-trust__item svg{margin-bottom:18px}.apbf-trust__item p{font-size:.8rem}}
+  @media(max-width:380px){.apbf-build-notice{width:calc(100% - 20px)}.apbf-hero,.apbf-categories,.apbf-products,.apbf-trust{width:calc(100% - 20px)}.apbf-hero__copy h1{font-size:1.7rem}.apbf-product__content{padding:9px}.apbf-product__content>div{display:grid}.apbf-category{padding:16px}}
+  @media(prefers-reduced-motion:reduce){.apbf *{transition:none!important;scroll-behavior:auto!important}}
+
+  /* Compact trust box aligned with the category/product card grids */
+  .apbf .apbf-trust{width:100%;max-width:900px;margin-inline:auto;margin-bottom:clamp(70px,8vw,110px);padding:28px}
+  .apbf .apbf-trust__header{display:flex;align-items:center;margin-bottom:24px}
+  .apbf .apbf-trust__brand{display:flex;min-height:88px;align-items:center;justify-content:center;padding:16px 18px;background:#fff}
+  .apbf .apbf-trust__logo{display:block;width:min(100%,180px);height:auto}
+  .apbf .apbf-trust__grid{gap:10px}
+  .apbf .apbf-trust__item{padding:22px 18px}
+  .apbf .apbf-trust__item svg{width:34px;height:34px;margin-bottom:18px}
+  .apbf .apbf-trust__item h3{font-size:1rem}
+  .apbf .apbf-trust__item p{font-size:.78rem}
+  @media(max-width:989px){.apbf .apbf-trust{max-width:420px}.apbf .apbf-trust__header{margin-bottom:20px}.apbf .apbf-trust__brand{justify-content:flex-start}.apbf .apbf-trust__grid{grid-template-columns:1fr}}
+  @media(max-width:749px){.apbf .apbf-trust{max-width:300px;padding:18px}.apbf .apbf-trust__brand{min-height:72px;padding:13px 14px}.apbf .apbf-trust__logo{width:min(100%,150px)}.apbf .apbf-trust__item{padding:18px 15px}}
+
+  /* Motion graphic: honeycomb with bees between headline and photo (snippets/apibavaria-motion-hive.liquid) */
+  .apbf .apbf-hero__hive{position:absolute;z-index:2;inset-block:0;inset-inline-start:52%;width:34%}
+  @media(max-width:749px){.apbf .apbf-hero__hive{inset-block:0 auto;inset-inline:auto -8px;width:min(46%,200px);height:132px;opacity:.75}}
+{% endstylesheet %}
+
+{% schema %}
+{"name":"API Bavaria Fokus","settings":[],"presets":[{"name":"API Bavaria Fokus"}]}
+{% endschema %}

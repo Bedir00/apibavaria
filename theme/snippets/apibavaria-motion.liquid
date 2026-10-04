@@ -1,0 +1,18 @@
+{%- doc -%}
+  Loads the API Bavaria motion layer (scroll reveals, icon line drawing, honeycomb
+  playback control). Rendered once in the <head> of layout/theme.liquid. Controlled by
+  the theme settings `apb_motion_enabled` and `apb_motion_hero` (Theme settings >
+  Animations).
+
+  @example
+  {% render 'apibavaria-motion' %}
+{%- enddoc -%}
+
+{%- if settings.apb_motion_enabled or settings.apb_motion_hero -%}
+  {{ 'apibavaria-motion.css' | asset_url | stylesheet_tag }}
+  <script
+    src="{{ 'apibavaria-motion.js' | asset_url }}"
+    data-reveal="{{ settings.apb_motion_enabled }}"
+    defer
+  ></script>
+{%- endif -%}

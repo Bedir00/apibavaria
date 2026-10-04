@@ -1,0 +1,116 @@
+/*
+ * API Bavaria motion layer – scroll reveals and micro-motion.
+ * Hidden start states only apply to elements that assets/apibavaria-motion.js marks
+ * with `.apb-reveal`, so content stays visible without JavaScript.
+ */
+
+@media (prefers-reduced-motion: no-preference) {
+  html .apb-reveal {
+    opacity: 0;
+    transform: translate3d(0, 28px, 0);
+    transition:
+      opacity 0.7s var(--animation-timing-fade-in, cubic-bezier(0.16, 1, 0.3, 1)),
+      transform 0.9s var(--animation-timing-fade-in, cubic-bezier(0.16, 1, 0.3, 1));
+    transition-delay: var(--apb-reveal-delay, 0ms);
+  }
+
+  html .apb-reveal.is-revealed {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Outlined icons draw their strokes once revealed (paths get pathLength="1"). */
+  html .apb-reveal svg path[pathLength='1'] {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 1.2s var(--ease-out-cubic, cubic-bezier(0.33, 1, 0.68, 1));
+    transition-delay: calc(var(--apb-reveal-delay, 0ms) + 250ms);
+  }
+
+  html .apb-reveal.is-revealed svg path[pathLength='1'] {
+    stroke-dashoffset: 0;
+  }
+
+  html .apb-reveal svg path[pathLength='1'] + path[pathLength='1'] {
+    transition-delay: calc(var(--apb-reveal-delay, 0ms) + 650ms);
+  }
+
+  /* Homepage hero: headline rises in, "Imkereibedarf" gets a honey highlighter stroke. */
+  .apbf-hero__copy h1 {
+    animation: apb-hero-rise 0.9s var(--animation-timing-fade-in, cubic-bezier(0.16, 1, 0.3, 1)) both;
+  }
+
+  .apbf-hero__copy h1 span:last-child {
+    background-image: linear-gradient(rgb(226 177 60 / 0.42), rgb(226 177 60 / 0.42));
+    background-position: 0 88%;
+    background-repeat: no-repeat;
+    background-size: 0% 0.26em;
+    animation: apb-hero-highlight 0.9s var(--ease-out-cubic, cubic-bezier(0.33, 1, 0.68, 1)) 0.75s forwards;
+  }
+
+  /* Desktop only: the hero clips its image there, so the settle-in zoom stays inside. */
+  @media (min-width: 750px) {
+    .apbf-hero__image {
+      animation: apb-hero-image 1.6s var(--ease-out-cubic, cubic-bezier(0.33, 1, 0.68, 1)) both;
+    }
+  }
+
+  /* "Weitere Kategorien folgen" – live status dot. */
+  .apbf-build-notice strong::before {
+    display: inline-block;
+    width: 0.55em;
+    height: 0.55em;
+    margin-inline-end: 0.55em;
+    background: #6b7d32;
+    vertical-align: 0.05em;
+    animation: apb-status-pulse 2.2s ease-out infinite;
+    content: '';
+  }
+}
+
+/* Mobile stacks the headline spans as blocks; keep the highlighter as wide as the word. */
+@media (max-width: 749px) {
+  .apbf-hero__copy h1 span:last-child {
+    width: fit-content;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .apbf-hero__copy h1 span:last-child {
+    background-image: linear-gradient(rgb(226 177 60 / 0.42), rgb(226 177 60 / 0.42));
+    background-position: 0 88%;
+    background-repeat: no-repeat;
+    background-size: 100% 0.26em;
+  }
+}
+
+@keyframes apb-hero-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+  }
+}
+
+@keyframes apb-hero-highlight {
+  to {
+    background-size: 100% 0.26em;
+  }
+}
+
+@keyframes apb-hero-image {
+  from {
+    opacity: 0.4;
+    transform: scale(1.04);
+  }
+}
+
+@keyframes apb-status-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgb(107 125 50 / 0.45);
+  }
+
+  70%,
+  100% {
+    box-shadow: 0 0 0 0.6em rgb(107 125 50 / 0);
+  }
+}

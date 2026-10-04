@@ -1,0 +1,276 @@
+{%- doc -%}
+  Renders the decorative API Bavaria honeycomb motion graphic: hexagon cells that draw
+  themselves in, a few honey cells that fill and glow, and optional bees flying loops
+  across the comb. Purely decorative (aria-hidden). Motion stops under
+  `prefers-reduced-motion: reduce`, and `assets/apibavaria-motion.js` pauses it while
+  it is off screen.
+
+  @param {string} [variant] - 'hero' (light background, default) or 'banner' (dark background)
+  @param {boolean} [bees] - Render the flying bees. Defaults to true.
+  @param {string} [class] - Extra classes for positioning by the caller
+
+  @example
+  {% render 'apibavaria-motion-hive', variant: 'hero', bees: true, class: 'apbf-hero__hive' %}
+{%- enddoc -%}
+
+{%- liquid
+  assign hive_variant = variant | default: 'hero'
+  assign show_bees = true
+  if bees == false
+    assign show_bees = false
+  endif
+-%}
+
+<div class="apb-hive apb-hive--{{ hive_variant }}{% if class != blank %} {{ class }}{% endif %}" aria-hidden="true">
+  <svg
+    class="apb-hive__svg"
+    viewBox="0 0 520 420"
+    preserveAspectRatio="xMidYMid meet"
+    focusable="false"
+  >
+    <g class="apb-hive__comb">
+        <path class="apb-hive__cell" style="--i:0;--o:0.87" d="M225.8 170.0 251.8 185.0 251.8 215.0 225.8 230.0 199.9 215.0 199.9 185.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:1;--o:0.86" d="M277.8 170.0 303.8 185.0 303.8 215.0 277.8 230.0 251.8 215.0 251.8 185.0Z" pathLength="1"/>
+        <path class="apb-hive__cell apb-hive__cell--honey" style="--i:2;--o:0.85" d="M251.8 215.0 277.8 230.0 277.8 260.0 251.8 275.0 225.8 260.0 225.8 230.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:3;--o:0.74" d="M199.9 215.0 225.8 230.0 225.8 260.0 199.9 275.0 173.9 260.0 173.9 230.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:4;--o:0.73" d="M303.8 215.0 329.8 230.0 329.8 260.0 303.8 275.0 277.8 260.0 277.8 230.0Z" pathLength="1"/>
+        <path class="apb-hive__cell apb-hive__cell--honey" style="--i:5;--o:0.70" d="M251.8 125.0 277.8 140.0 277.8 170.0 251.8 185.0 225.8 170.0 225.8 140.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:6;--o:0.67" d="M173.9 170.0 199.9 185.0 199.9 215.0 173.9 230.0 147.9 215.0 147.9 185.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:7;--o:0.65" d="M329.8 170.0 355.7 185.0 355.7 215.0 329.8 230.0 303.8 215.0 303.8 185.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:8;--o:0.63" d="M199.9 125.0 225.8 140.0 225.8 170.0 199.9 185.0 173.9 170.0 173.9 140.0Z" pathLength="1"/>
+        <path class="apb-hive__cell apb-hive__cell--honey" style="--i:9;--o:0.62" d="M303.8 125.0 329.8 140.0 329.8 170.0 303.8 185.0 277.8 170.0 277.8 140.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:10;--o:0.61" d="M225.8 260.0 251.8 275.0 251.8 305.0 225.8 320.0 199.9 305.0 199.9 275.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:11;--o:0.61" d="M277.8 260.0 303.8 275.0 303.8 305.0 277.8 320.0 251.8 305.0 251.8 275.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:12;--o:0.54" d="M147.9 215.0 173.9 230.0 173.9 260.0 147.9 275.0 121.9 260.0 121.9 230.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:13;--o:0.53" d="M355.7 215.0 381.7 230.0 381.7 260.0 355.7 275.0 329.8 260.0 329.8 230.0Z" pathLength="1"/>
+        <path class="apb-hive__cell apb-hive__cell--honey" style="--i:14;--o:0.50" d="M173.9 260.0 199.9 275.0 199.9 305.0 173.9 320.0 147.9 305.0 147.9 275.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:15;--o:0.49" d="M329.8 260.0 355.7 275.0 355.7 305.0 329.8 320.0 303.8 305.0 303.8 275.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:16;--o:0.47" d="M147.9 125.0 173.9 140.0 173.9 170.0 147.9 185.0 121.9 170.0 121.9 140.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:17;--o:0.47" d="M225.8 80.0 251.8 95.0 251.8 125.0 225.8 140.0 199.9 125.0 199.9 95.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:18;--o:0.46" d="M277.8 80.0 303.8 95.0 303.8 125.0 277.8 140.0 251.8 125.0 251.8 95.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:19;--o:0.46" d="M355.7 125.0 381.7 140.0 381.7 170.0 355.7 185.0 329.8 170.0 329.8 140.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:20;--o:0.45" d="M121.9 170.0 147.9 185.0 147.9 215.0 121.9 230.0 95.9 215.0 95.9 185.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:21;--o:0.44" d="M381.7 170.0 407.7 185.0 407.7 215.0 381.7 230.0 355.7 215.0 355.7 185.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:22;--o:0.40" d="M251.8 305.0 277.8 320.0 277.8 350.0 251.8 365.0 225.8 350.0 225.8 320.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:23;--o:0.38" d="M173.9 80.0 199.9 95.0 199.9 125.0 173.9 140.0 147.9 125.0 147.9 95.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:24;--o:0.38" d="M329.8 80.0 355.7 95.0 355.7 125.0 329.8 140.0 303.8 125.0 303.8 95.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:25;--o:0.36" d="M199.9 305.0 225.8 320.0 225.8 350.0 199.9 365.0 173.9 350.0 173.9 320.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:26;--o:0.36" d="M303.8 305.0 329.8 320.0 329.8 350.0 303.8 365.0 277.8 350.0 277.8 320.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:27;--o:0.34" d="M121.9 260.0 147.9 275.0 147.9 305.0 121.9 320.0 95.9 305.0 95.9 275.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:28;--o:0.33" d="M95.9 215.0 121.9 230.0 121.9 260.0 95.9 275.0 70.0 260.0 70.0 230.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:29;--o:0.33" d="M381.7 260.0 407.7 275.0 407.7 305.0 381.7 320.0 355.7 305.0 355.7 275.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:30;--o:0.31" d="M407.7 215.0 433.7 230.0 433.7 260.0 407.7 275.0 381.7 260.0 381.7 230.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:31;--o:0.28" d="M95.9 125.0 121.9 140.0 121.9 170.0 95.9 185.0 70.0 170.0 70.0 140.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:32;--o:0.27" d="M407.7 125.0 433.7 140.0 433.7 170.0 407.7 185.0 381.7 170.0 381.7 140.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:33;--o:0.26" d="M147.9 305.0 173.9 320.0 173.9 350.0 147.9 365.0 121.9 350.0 121.9 320.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:34;--o:0.25" d="M355.7 305.0 381.7 320.0 381.7 350.0 355.7 365.0 329.8 350.0 329.8 320.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:35;--o:0.25" d="M251.8 35.0 277.8 50.0 277.8 80.0 251.8 95.0 225.8 80.0 225.8 50.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:36;--o:0.24" d="M121.9 80.0 147.9 95.0 147.9 125.0 121.9 140.0 95.9 125.0 95.9 95.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:37;--o:0.22" d="M199.9 35.0 225.8 50.0 225.8 80.0 199.9 95.0 173.9 80.0 173.9 50.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:38;--o:0.22" d="M303.8 35.0 329.8 50.0 329.8 80.0 303.8 95.0 277.8 80.0 277.8 50.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:39;--o:0.22" d="M433.7 170.0 459.7 185.0 459.7 215.0 433.7 230.0 407.7 215.0 407.7 185.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:40;--o:0.18" d="M70.0 260.0 95.9 275.0 95.9 305.0 70.0 320.0 44.0 305.0 44.0 275.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:41;--o:0.18" d="M433.7 260.0 459.7 275.0 459.7 305.0 433.7 320.0 407.7 305.0 407.7 275.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:42;--o:0.18" d="M147.9 35.0 173.9 50.0 173.9 80.0 147.9 95.0 121.9 80.0 121.9 50.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:43;--o:0.18" d="M95.9 305.0 121.9 320.0 121.9 350.0 95.9 365.0 70.0 350.0 70.0 320.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:44;--o:0.18" d="M459.7 215.0 485.7 230.0 485.7 260.0 459.7 275.0 433.7 260.0 433.7 230.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:45;--o:0.18" d="M277.8 -10.0 303.8 5.0 303.8 35.0 277.8 50.0 251.8 35.0 251.8 5.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:46;--o:0.18" d="M121.9 350.0 147.9 365.0 147.9 395.0 121.9 410.0 95.9 395.0 95.9 365.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:47;--o:0.18" d="M485.7 170.0 511.6 185.0 511.6 215.0 485.7 230.0 459.7 215.0 459.7 185.0Z" pathLength="1"/>
+        <path class="apb-hive__cell" style="--i:48;--o:0.18" d="M44.0 305.0 70.0 320.0 70.0 350.0 44.0 365.0 18.0 350.0 18.0 320.0Z" pathLength="1"/>
+    </g>
+    {%- if show_bees -%}
+      <g class="apb-hive__trails">
+        <path d="M70 300C150 120 360 50 460 170S310 410 170 330 10 360 70 300Z"/>
+        <path d="M470 80C380 10 190 110 250 205S490 330 430 225 530 150 470 80Z"/>
+      </g>
+      <g class="apb-hive__bees">
+        <g class="apb-bee">
+          <animateMotion dur="16s" repeatCount="indefinite" rotate="auto" path="M70 300C150 120 360 50 460 170S310 410 170 330 10 360 70 300Z"/>
+          <g transform="scale(1.6)">
+            <g class="apb-bee__inner">
+              <ellipse class="apb-bee__wing" cx="-2" cy="-7" rx="6" ry="4"/>
+              <ellipse class="apb-bee__wing apb-bee__wing--back" cx="3.5" cy="-6.5" rx="5" ry="3.4"/>
+              <ellipse class="apb-bee__body" rx="9" ry="6"/>
+              <path class="apb-bee__stripes" d="M-3.5-5.5v11M1.5-5.8v11.6"/>
+              <circle class="apb-bee__head" cx="9.5" r="4"/>
+            </g>
+          </g>
+        </g>
+        <g class="apb-bee">
+          <animateMotion dur="21s" begin="-7s" repeatCount="indefinite" rotate="auto" path="M470 80C380 10 190 110 250 205S490 330 430 225 530 150 470 80Z"/>
+          <g transform="scale(1.25)">
+            <g class="apb-bee__inner">
+              <ellipse class="apb-bee__wing" cx="-2" cy="-7" rx="6" ry="4"/>
+              <ellipse class="apb-bee__wing apb-bee__wing--back" cx="3.5" cy="-6.5" rx="5" ry="3.4"/>
+              <ellipse class="apb-bee__body" rx="9" ry="6"/>
+              <path class="apb-bee__stripes" d="M-3.5-5.5v11M1.5-5.8v11.6"/>
+              <circle class="apb-bee__head" cx="9.5" r="4"/>
+            </g>
+          </g>
+        </g>
+      </g>
+    {%- endif -%}
+  </svg>
+</div>
+
+{% stylesheet %}
+  .apb-hive {
+    --apb-hive-stroke: #6b7d32;
+    --apb-hive-honey: #e2b13c;
+    --apb-hive-bee-body: #e2b13c;
+    --apb-hive-bee-dark: #3f4a1f;
+    --apb-hive-wing: rgb(255 255 255 / 0.85);
+    --apb-hive-trail: rgb(107 125 50 / 0.22);
+
+    position: relative;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .apb-hive--banner {
+    --apb-hive-stroke: #cfdaa9;
+    --apb-hive-trail: rgb(207 218 169 / 0.2);
+    --apb-hive-wing: rgb(255 255 255 / 0.7);
+  }
+
+  .apb-hive__svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .apb-hive__cell {
+    fill: transparent;
+    stroke: var(--apb-hive-stroke);
+    stroke-width: 1.4;
+    stroke-linejoin: miter;
+    opacity: calc(var(--o, 1) * 0.55);
+  }
+
+  .apb-hive--banner .apb-hive__cell {
+    opacity: calc(var(--o, 1) * 0.75);
+  }
+
+  .apb-hive__cell--honey {
+    fill: var(--apb-hive-honey);
+    fill-opacity: 0.32;
+  }
+
+  .apb-hive__trails path {
+    fill: none;
+    stroke: var(--apb-hive-trail);
+    stroke-width: 1;
+    stroke-dasharray: 2 7;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .apb-bee__body {
+    fill: var(--apb-hive-bee-body);
+  }
+
+  .apb-bee__stripes {
+    fill: none;
+    stroke: var(--apb-hive-bee-dark);
+    stroke-width: 2.4;
+  }
+
+  .apb-bee__head {
+    fill: var(--apb-hive-bee-dark);
+  }
+
+  .apb-bee__wing {
+    fill: var(--apb-hive-wing);
+    stroke: var(--apb-hive-bee-dark);
+    stroke-width: 0.6;
+    stroke-opacity: 0.4;
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .apb-hive__cell {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+      animation: apb-hive-draw 1.1s var(--animation-timing-fade-in, cubic-bezier(0.16, 1, 0.3, 1)) forwards;
+      animation-delay: calc(var(--i, 0) * 45ms + 150ms);
+    }
+
+    .apb-hive__cell--honey {
+      fill-opacity: 0;
+      animation:
+        apb-hive-draw 1.1s var(--animation-timing-fade-in, cubic-bezier(0.16, 1, 0.3, 1)) forwards,
+        apb-hive-honey 5.5s ease-in-out infinite;
+      animation-delay: calc(var(--i, 0) * 45ms + 150ms), calc(var(--i, 0) * 45ms + 1.4s);
+    }
+
+    .apb-hive__trails {
+      opacity: 0;
+      animation: apb-hive-fade 1.2s ease 1.6s forwards;
+    }
+
+    .apb-hive__bees {
+      opacity: 0;
+      animation: apb-hive-fade 0.8s ease 1.8s forwards;
+    }
+
+    .apb-bee__wing {
+      animation: apb-bee-flap 90ms linear infinite alternate;
+    }
+
+    .apb-bee__wing--back {
+      animation-delay: -45ms;
+    }
+
+    .apb-bee__inner {
+      animation: apb-bee-hover 1.6s ease-in-out infinite alternate;
+    }
+
+    .apb-hive.is-paused * {
+      animation-play-state: paused !important;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .apb-hive__bees,
+    .apb-hive__trails {
+      display: none;
+    }
+  }
+
+  @keyframes apb-hive-draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes apb-hive-honey {
+    0%,
+    100% {
+      fill-opacity: 0.12;
+    }
+
+    50% {
+      fill-opacity: 0.45;
+    }
+  }
+
+  @keyframes apb-hive-fade {
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes apb-bee-flap {
+    to {
+      transform: scaleY(0.35);
+    }
+  }
+
+  @keyframes apb-bee-hover {
+    to {
+      transform: translateY(-3px);
+    }
+  }
+{% endstylesheet %}
