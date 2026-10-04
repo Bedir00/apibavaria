@@ -1,0 +1,234 @@
+{% doc %}
+  Home-Deluxe-style header actions for APIBAVARIA.
+{% enddoc %}
+
+<script type="module" src="{{ 'cart-icon.js' | asset_url }}" fetchpriority="low"></script>
+
+{% capture account_icon %}
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="22" viewBox="0 0 15 17" fill="none" class="account-button__icon" aria-hidden="true">
+    <path stroke="currentColor" stroke-linejoin="round" stroke-width="1.2" d="M10.375 3.813a3.063 3.063 0 1 1-6.125 0 3.063 3.063 0 0 1 6.125 0ZM7.313 9.5c-3.667 0-6.24 2.691-6.563 6.125h13.125C13.552 12.191 10.979 9.5 7.312 9.5Z"/>
+  </svg>
+{% endcapture %}
+
+{% capture cart_icon %}
+  <cart-icon class="header-actions__cart-icon{% unless cart == empty %} header-actions__cart-icon--has-cart{% endunless %}" data-testid="cart-icon">
+    <span class="svg-wrapper" aria-hidden="true">{{ 'icon-cart.svg' | inline_asset_content }}</span>
+    {% render 'cart-bubble', limit: 100 %}
+  </cart-icon>
+{% endcapture %}
+
+<header-actions class="apb-hd-actions" {{- block.shopify_attributes -}}>
+  {% if shop.customer_accounts_enabled %}
+    <div class="account-button header-actions__action color-custom-popover apb-hd-action">
+      <shopify-account menu="{{ customer_account_menu }}">
+        {% if customer %}
+          <span slot="signed-out-avatar" class="apb-hd-action__inner">
+            <span class="apb-hd-action__icon">{{ account_icon }}</span>
+            <span class="apb-hd-action__copy"><strong>Mein Konto</strong><small>Angemeldet</small></span>
+          </span>
+        {% else %}
+          <span slot="signed-out-avatar" class="apb-hd-action__inner">
+            <span class="apb-hd-action__icon">{{ account_icon }}</span>
+            <span class="apb-hd-action__copy"><strong>Mein Konto</strong><small>Anmelden</small></span>
+          </span>
+        {% endif %}
+      </shopify-account>
+    </div>
+  {% endif %}
+
+  {% if settings.cart_type == 'drawer' and template.name != 'cart' %}
+    <button class="header-actions__action button-unstyled apb-hd-action" on:click="#cart-drawer/toggle" aria-haspopup="dialog" aria-expanded="false" aria-controls="cart-drawer" aria-label="{{ 'accessibility.cart' | t }}" aria-describedby="cart-bubble-text" data-testid="cart-drawer-trigger">
+      <span class="apb-hd-action__inner">
+        <span class="apb-hd-action__icon">{{ cart_icon }}</span>
+      </span>
+    </button>
+  {% else %}
+    <a href="{{ routes.cart_url }}" class="header-actions__action action__cart apb-hd-action" aria-label="{{ 'accessibility.cart' | t }}" aria-describedby="cart-bubble-text">
+      <span class="apb-hd-action__inner">
+        <span class="apb-hd-action__icon">{{ cart_icon }}</span>
+      </span>
+    </a>
+  {% endif %}
+
+  <span ref="liveRegion" class="visually-hidden" role="status" data-testid="cart-count-live-region"></span>
+</header-actions>
+
+<script type="module" src="{{ 'header-actions.js' | asset_url }}" fetchpriority="low"></script>
+
+{% stylesheet %}
+  .account-button {
+    background: transparent;
+  }
+
+  .account-button__icon {
+    color: var(--color-account-icon);
+  }
+
+  shopify-account {
+    --shopify-account-dialog-position-top: var(--header-group-height);
+  }
+
+  #header-component,
+  #header-component .header__columns,
+  #header-component .header__column,
+  header-actions.apb-hd-actions,
+  .apb-hd-action,
+  .apb-hd-action__inner,
+  .apb-hd-action__icon,
+  .header-actions__cart-icon {
+    overflow: visible !important;
+  }
+
+  .apb-hd-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 22px;
+    min-width: max-content;
+    max-width: 100%;
+    position: relative;
+    z-index: 20;
+  }
+
+  .apb-hd-action {
+    color: var(--color-foreground);
+    text-decoration: none;
+    flex: 0 0 auto;
+    position: relative;
+    z-index: 20;
+  }
+
+  .apb-hd-action__inner {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    white-space: nowrap;
+  }
+
+  .apb-hd-action__icon {
+    display: grid;
+    place-items: center;
+    position: relative;
+    flex: 0 0 auto;
+    z-index: 21;
+  }
+
+  .apb-hd-action__icon .svg-wrapper,
+  .apb-hd-action__icon svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .apb-hd-action__copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: 1.15;
+  }
+
+  .apb-hd-action__copy strong {
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .apb-hd-action__copy small {
+    margin-top: 3px;
+    font-size: 11px;
+    opacity: .68;
+  }
+
+  .header-actions__cart-icon {
+    position: relative;
+    z-index: 22;
+  }
+
+  .header-actions__cart-icon .cart-bubble {
+    position: absolute;
+    top: -4px;
+    right: -7px;
+    z-index: 30;
+  }
+
+  @media screen and (min-width: 750px) and (max-width: 1180px) {
+    .apb-hd-actions {
+      gap: 4px;
+    }
+
+    .apb-hd-action__copy {
+      display: none;
+    }
+
+    .apb-hd-action {
+      width: 44px;
+      min-width: 44px;
+      min-height: 44px;
+      display: grid;
+      place-items: center;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    #header-component .header__columns header-actions.apb-hd-actions {
+      grid-area: auto;
+      grid-column: 4 / 6;
+      grid-row: 1;
+      justify-self: end;
+      width: 88px;
+      min-width: 88px;
+      max-width: 88px;
+      gap: 0;
+      overflow: visible !important;
+    }
+
+    .apb-hd-action__copy {
+      display: none;
+    }
+
+    .apb-hd-action {
+      width: 44px;
+      min-width: 44px;
+      max-width: 44px;
+      min-height: 44px;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      margin: 0;
+    }
+
+    .apb-hd-action__inner {
+      gap: 0;
+      width: 44px;
+      min-width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+    }
+
+    .header-actions__cart-icon .cart-bubble {
+      top: -2px;
+      right: 4px;
+      transform: scale(.85);
+      transform-origin: center;
+      z-index: 30;
+    }
+  }
+
+  @media screen and (max-width: 374px) {
+    #header-component .header__columns {
+      --header-mobile-bookend: 40px;
+    }
+
+    #header-component .header__columns header-actions.apb-hd-actions {
+      width: 80px;
+      min-width: 80px;
+      max-width: 80px;
+    }
+
+    .apb-hd-action,
+    .apb-hd-action__inner {
+      width: 40px;
+      min-width: 40px;
+      max-width: 40px;
+    }
+  }
+{% endstylesheet %}
