@@ -35,13 +35,13 @@
     transition-delay: calc(var(--apb-reveal-delay, 0ms) + 650ms);
   }
 
-  /* Homepage hero: headline rises in, "Imkereibedarf" gets a honey highlighter stroke. */
+  /* Homepage hero: headline rises in, "Imkereibedarf" gets a sage highlighter stroke (CI #c6d29d). */
   .apbf-hero__copy h1 {
     animation: apb-hero-rise 0.9s var(--animation-timing-fade-in, cubic-bezier(0.16, 1, 0.3, 1)) both;
   }
 
   .apbf-hero__copy h1 span:last-child {
-    background-image: linear-gradient(rgb(226 177 60 / 0.42), rgb(226 177 60 / 0.42));
+    background-image: linear-gradient(rgb(198 210 157 / 0.7), rgb(198 210 157 / 0.7));
     background-position: 0 88%;
     background-repeat: no-repeat;
     background-size: 0% 0.26em;
@@ -77,7 +77,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .apbf-hero__copy h1 span:last-child {
-    background-image: linear-gradient(rgb(226 177 60 / 0.42), rgb(226 177 60 / 0.42));
+    background-image: linear-gradient(rgb(198 210 157 / 0.7), rgb(198 210 157 / 0.7));
     background-position: 0 88%;
     background-repeat: no-repeat;
     background-size: 100% 0.26em;

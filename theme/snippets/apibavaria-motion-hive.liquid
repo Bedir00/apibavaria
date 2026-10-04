@@ -116,9 +116,11 @@
 
 {% stylesheet %}
   .apb-hive {
+    /* API Bavaria CI palette only */
     --apb-hive-stroke: #6b7d32;
-    --apb-hive-honey: #e2b13c;
-    --apb-hive-bee-body: #e2b13c;
+    --apb-hive-honey: #c6d29d;
+    --apb-hive-bee-body: #6b7d32;
+    --apb-hive-bee-stripe: #e7ecd4;
     --apb-hive-bee-dark: #3f4a1f;
     --apb-hive-wing: rgb(255 255 255 / 0.85);
     --apb-hive-trail: rgb(107 125 50 / 0.22);
@@ -130,6 +132,10 @@
 
   .apb-hive--banner {
     --apb-hive-stroke: #cfdaa9;
+    --apb-hive-honey: #c6d29d;
+    --apb-hive-bee-body: #c6d29d;
+    --apb-hive-bee-stripe: #3f4a1f;
+    --apb-hive-bee-dark: #f5f7ec;
     --apb-hive-trail: rgb(207 218 169 / 0.2);
     --apb-hive-wing: rgb(255 255 255 / 0.7);
   }
@@ -172,7 +178,7 @@
 
   .apb-bee__stripes {
     fill: none;
-    stroke: var(--apb-hive-bee-dark);
+    stroke: var(--apb-hive-bee-stripe);
     stroke-width: 2.4;
   }
 
@@ -182,9 +188,9 @@
 
   .apb-bee__wing {
     fill: var(--apb-hive-wing);
-    stroke: var(--apb-hive-bee-dark);
+    stroke: var(--apb-hive-stroke);
     stroke-width: 0.6;
-    stroke-opacity: 0.4;
+    stroke-opacity: 0.6;
     transform-box: fill-box;
     transform-origin: 50% 100%;
   }

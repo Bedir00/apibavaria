@@ -6,12 +6,12 @@ nur die neuen oder geänderten Dateien, in derselben Ordnerstruktur wie im Theme
 
 ## Motion Graphics
 
-Ruhige Animationen, die zur kantigen, technischen CI passen.
+Ruhige Animationen, die zur kantigen, technischen CI passen. Sie verwenden ausschließlich die CI-Farben, auch für die Bienen.
 
 | Element | Wo | Dateien |
 | --- | --- | --- |
 | Animierte Honigwabe: Zellen zeichnen sich, Honigzellen pulsieren, zwei Bienen fliegen Schleifen | Startseiten-Hero, Motion-Banner | `snippets/apibavaria-motion-hive.liquid` |
-| Headline steigt ein, „Imkereibedarf“ bekommt einen Honig-Textmarker, das Hero-Bild zoomt sanft auf (nur Desktop) | Startseiten-Hero | `assets/apibavaria-motion.css` |
+| Headline steigt ein, „Imkereibedarf“ bekommt einen Textmarker in CI-Salbei, das Hero-Bild zoomt sanft auf (nur Desktop) | Startseiten-Hero | `assets/apibavaria-motion.css` |
 | Scroll-Reveals: Überschriften, Kategorie-/Produktkarten, Trust-Box und Produktraster blenden gestaffelt ein | Startseite, Kollektionsseiten | `assets/apibavaria-motion.js`, `assets/apibavaria-motion.css` |
 | Die Linien-Icons der Trust-Box zeichnen sich beim Einblenden | Startseite | `assets/apibavaria-motion.js`, `assets/apibavaria-motion.css` |
 | Pulsierender Statuspunkt bei „Weitere Kategorien folgen!“ | Startseite | `assets/apibavaria-motion.css` |
@@ -60,9 +60,12 @@ pflegst sie im Shopify-Admin unter *Produkt > Metafelder*, alle Felder beginnen 
 | PDP: Fragen und Antworten `apb.faq` | `Frage \| Antwort` | „Häufige Fragen“ |
 | PDP: Passendes Zubehör `apb.zubehoer` | Produkte | „Das passt dazu“ (max. 3) |
 
-Bereiche ohne Daten werden automatisch ausgeblendet. Farbwelt und Linien-Motiv richten
-sich nach dem Produkttyp: Bienenfütterung = Honig, Mittelwände = Wachs, Rähmchen =
-Holz, Gläser = Glas, alles andere = Grün.
+Bereiche ohne Daten werden automatisch ausgeblendet. Alle Farben stammen aus der
+API-Bavaria-CI (Weiß, `#3f4a1f`, `#6b7d32`, Linien `#d8dfbd`, Flächen `#f5f7ec` / `#e7ecd4`),
+Ecken sind eckig, und Hover-Effekte kommen ohne Bewegung aus. Je nach Produkttyp
+ändern sich nur das Linien-Motiv (Tropfen, Wabe, Rähmchen, Glas, Smoker) und der
+Flächenton der Story-Einleitung (Salbei, Mist oder Weiß), so wie bei den
+Kategoriekarten der Startseite.
 
 Theme-Dateien:
 

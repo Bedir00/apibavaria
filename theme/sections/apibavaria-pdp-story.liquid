@@ -6,8 +6,8 @@
   (apb.kennzahlen "Wert | Beschriftung"), usage steps (apb.anwendung "Schritt | Text"),
   season calendar (apb.einsatzmonate, apb.einsatz_hinweis), curated accessories
   (apb.zubehoer) and FAQ (apb.faq "Frage | Antwort"). Parts without data are skipped.
-  Colours and the outlined motif follow the product type (feed, foundation, frames,
-  jars, tools).
+  Colours stay inside the API Bavaria CI palette; the outlined motif and the surface
+  tint (white, mist, sage) follow the product type (feed, foundation, frames, jars, tools).
   @example
   <!-- templates/product.json: section "apb_story" directly after "main" -->
 {% endcomment %}
@@ -256,11 +256,12 @@
 
 {% stylesheet %}
   .apb-story {
+    /* API Bavaria CI palette (config/settings_data.json color_palette + homepage tints) */
     --apb-ink: #3f4a1f;
     --apb-muted: #5f6c39;
-    --apb-line: #d7debb;
-    --apb-accent: #56662a;
-    --apb-accent-soft: #a1ad78;
+    --apb-line: #d8dfbd;
+    --apb-accent: #6b7d32;
+    --apb-accent-soft: #c6d29d;
     --apb-tint: #f5f7ec;
 
     width: min(100% - 32px, 1200px);
@@ -274,32 +275,17 @@
     box-sizing: border-box;
   }
 
+  /* Category surfaces use the CI tints only, like the homepage category cards. */
   .apb-story--futter {
-    --apb-accent: #a86f00;
-    --apb-accent-soft: #e2b13c;
-    --apb-tint: #fbf3df;
-    --apb-line: #ecdcb1;
-  }
-
-  .apb-story--wachs {
-    --apb-accent: #8a6a0c;
-    --apb-accent-soft: #d9b44a;
-    --apb-tint: #f7f0d6;
-    --apb-line: #e6d9a8;
+    --apb-tint: #e7ecd4;
   }
 
   .apb-story--holz {
-    --apb-accent: #7a4f26;
-    --apb-accent-soft: #c49a6c;
-    --apb-tint: #f4ece2;
-    --apb-line: #e2d2bf;
+    --apb-tint: #eef1df;
   }
 
   .apb-story--glas {
-    --apb-accent: #2f6b63;
-    --apb-accent-soft: #8fbcb4;
-    --apb-tint: #eaf3f1;
-    --apb-line: #c9ddd8;
+    --apb-tint: #ffffff;
   }
 
   .apb-sr {
@@ -318,8 +304,8 @@
   .apb-story__kicker {
     margin: 0 0 10px;
     color: var(--apb-accent);
-    font-size: 0.68rem;
-    font-weight: 700;
+    font-size: 0.72rem;
+    font-weight: 600;
     letter-spacing: 0.14em;
     text-transform: uppercase;
   }
@@ -343,9 +329,9 @@
   .apb-story__claim {
     margin: 0;
     color: var(--apb-ink);
-    font-size: clamp(1.7rem, 3.2vw, 2.9rem);
-    line-height: 1.02;
-    letter-spacing: -0.045em;
+    font-size: clamp(1.7rem, 3.2vw, 2.8rem);
+    line-height: 1;
+    letter-spacing: -0.04em;
     overflow-wrap: anywhere;
   }
 
@@ -466,9 +452,9 @@
 
   .apb-story__fact dd {
     margin: 0;
-    color: var(--apb-accent);
+    color: var(--apb-ink);
     font-size: clamp(1.25rem, 2.2vw, 1.9rem);
-    font-weight: 700;
+    font-weight: 600;
     line-height: 1.05;
     letter-spacing: -0.03em;
     font-variant-numeric: tabular-nums;
@@ -476,9 +462,11 @@
   }
 
   .apb-story__fact dt {
-    color: var(--apb-muted);
-    font-size: 0.74rem;
+    color: var(--apb-accent);
+    font-size: 0.66rem;
     font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
   }
 
   /* Blocks */
@@ -519,7 +507,7 @@
     position: absolute;
     inset: -1px -1px auto;
     height: 3px;
-    background: var(--apb-accent-soft);
+    background: var(--apb-accent);
     content: "";
   }
 
@@ -528,7 +516,7 @@
     margin-bottom: 18px;
     color: var(--apb-accent);
     font-size: 0.78rem;
-    font-weight: 700;
+    font-weight: 600;
     letter-spacing: 0.08em;
     font-variant-numeric: tabular-nums;
   }
@@ -585,7 +573,7 @@
     position: absolute;
     inset: 0 0 auto;
     height: 38%;
-    background: var(--apb-accent-soft);
+    background: var(--apb-accent);
     content: "";
   }
 
@@ -666,11 +654,6 @@
 
   .apb-story__related-arrow {
     color: var(--apb-accent);
-    transition: transform var(--animation-speed-slow, 0.2s) var(--ease-out-cubic, ease);
-  }
-
-  .apb-story__related-link:hover .apb-story__related-arrow {
-    transform: translateX(4px);
   }
 
   /* FAQ */
@@ -722,7 +705,7 @@
     position: absolute;
     inset: 6px 0 auto;
     height: 2px;
-    background: var(--apb-accent);
+    background: var(--apb-ink);
     content: "";
     transition: transform var(--animation-speed-slow, 0.2s) ease;
   }
@@ -824,7 +807,6 @@
 
   @media (prefers-reduced-motion: reduce) {
     .apb-story__related-link,
-    .apb-story__related-arrow,
     .apb-story__toggle::before,
     .apb-story__toggle::after {
       transition: none;

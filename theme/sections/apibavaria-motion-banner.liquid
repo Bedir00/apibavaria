@@ -58,6 +58,9 @@
     --apb-banner-muted: #dde5c4;
     --apb-banner-accent: #c6d29d;
     --apb-banner-line: rgb(215 226 220 / 0.28);
+    --apb-banner-button-bg: #fff;
+    --apb-banner-button-fg: #3f4a1f;
+    --apb-banner-button-border: #fff;
 
     width: min(100% - 32px, 900px);
     margin: 0 auto clamp(56px, 7vw, 96px);
@@ -74,7 +77,10 @@
     --apb-banner-fg: #3f4a1f;
     --apb-banner-muted: #5f6c39;
     --apb-banner-accent: #6b7d32;
-    --apb-banner-line: #d7debb;
+    --apb-banner-line: #d8dfbd;
+    --apb-banner-button-bg: #6b7d32;
+    --apb-banner-button-fg: #fff;
+    --apb-banner-button-border: #6b7d32;
   }
 
   .apb-motion-banner__inner {
@@ -101,8 +107,8 @@
   .apb-motion-banner__kicker {
     margin: 0 0 10px;
     color: var(--apb-banner-accent);
-    font-size: 0.68rem;
-    font-weight: 750;
+    font-size: 0.72rem;
+    font-weight: 600;
     letter-spacing: 0.14em;
     text-transform: uppercase;
   }
@@ -142,31 +148,28 @@
     align-items: center;
     gap: 10px;
     padding: 11px 19px;
-    border: 1px solid var(--apb-banner-accent);
-    background: var(--apb-banner-accent);
-    color: var(--apb-banner-bg);
+    border: 1px solid var(--apb-banner-button-border);
+    background: var(--apb-banner-button-bg);
+    color: var(--apb-banner-button-fg);
     font-size: 0.84rem;
-    font-weight: 750;
+    font-weight: 600;
+    letter-spacing: 0.025em;
     text-decoration: none;
     transition: background-color var(--animation-speed-slow, 0.2s) ease, color var(--animation-speed-slow, 0.2s) ease;
   }
 
   .apb-motion-banner__button:hover {
     background: transparent;
-    color: var(--apb-banner-accent);
+    color: var(--apb-banner-button-border);
+  }
+
+  .apb-motion-banner--light .apb-motion-banner__button:hover {
+    color: var(--apb-banner-button-bg);
   }
 
   .apb-motion-banner__button:focus-visible {
     outline: 3px solid #a1ad78;
     outline-offset: 3px;
-  }
-
-  .apb-motion-banner__button span {
-    transition: transform var(--animation-speed-slow, 0.2s) var(--ease-out-cubic, ease);
-  }
-
-  .apb-motion-banner__button:hover span {
-    transform: translateX(4px);
   }
 
   .apb-motion-banner__hive {
@@ -208,8 +211,7 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .apb-motion-banner__button,
-    .apb-motion-banner__button span {
+    .apb-motion-banner__button {
       transition: none;
     }
   }
