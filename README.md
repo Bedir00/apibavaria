@@ -137,3 +137,45 @@ So überträgst du die Änderungen manuell in ein anderes Theme: Im Code-Editor 
 aus `theme/assets`, `theme/snippets` und `theme/sections` neu anlegen. Danach die
 Änderungen an `layout/theme.liquid`, `sections/apibavaria-home-focus.liquid` und
 `config/settings_schema.json` übernehmen. Die Stellen sind im Code kommentiert.
+
+## Amazon-Bilder
+
+`amazon/` erzeugt pro Amazon-Angebot ein **Hauptbild** (`<key>.MAIN.jpg`) und ein
+**USP-Bild** (`<key>.PT01.jpg`) aus den Shopify-Produktfotos.
+
+```
+pip install Pillow numpy rembg onnxruntime
+python3 amazon/build_images.py
+```
+
+Ergebnis: `amazon/output/<key>/`, dazu `uebersicht-hauptbilder.jpg` und `pruefbericht.json`.
+
+**Hauptbild (Amazon-Regeln):** 2000 × 2000 px, Hintergrund exakt RGB 255/255/255, Produkt
+füllt 88 % der Bildkante, kein Text, keine Badges, keine Grafiken. Was angeboten wird,
+zeigt das Bild über die abgebildeten Artikel: 10 Rähmchen als Stapel mit sichtbaren
+Kanten, 12 Gläser im Raster, im Bundle alle Teile zusammen. Mengenvarianten sind
+deshalb eigene Angebote mit eigenem Hauptbild.
+
+**USP-Bild (Bild 2):** CI-Farben (`#3f4a1f`, `#6b7d32`, `#d8dfbd`, `#f5f7ec`), Schrift
+Poppins wie im Theme, Mengen- bzw. Set-Kachel, „Passt zu“-System und Vorteile aus
+`apb.vorteile` bzw. der Lieferumfang beim Bundle.
+
+**Bundles** (in `amazon/listings.py`, im Shop noch nicht angelegt):
+
+| Bundle | Inhalt |
+| --- | --- |
+| `bundle-dnm-10-raehmchen-10-mittelwaende` | 10 × DNM-Rähmchen Hoffmann + 10 × DNM-Mittelwände 350 × 200 |
+| `bundle-dnm-20-raehmchen-20-mittelwaende` | 20 × DNM-Rähmchen Hoffmann + 20 × DNM-Mittelwände 350 × 200 |
+| `bundle-dnm-komplett-raehmchen-mittelwaende-trafoloeter` | 10 × Rähmchen + 10 × Mittelwände + Trafolöter 9 V |
+| `bundle-zander-20-mittelwaende-trafoloeter` | 20 × Zander-Mittelwände 395 × 195 + Trafolöter 9 V |
+
+Für Zander gibt es kein Rähmchen-Bundle: Im Shop gibt es nur Halbmaß-Rähmchen (110 mm),
+und dazu passt keine der Mittelwände ohne Zuschnitt.
+
+**Fotos:** Der Generator lädt die Shopify-Fotos aus `amazon/shop_export.json`. Ein
+besseres Foto legst du als `amazon/src_override/<handle>__<bildindex>.jpg` ab, es hat
+Vorrang. Im Prüfbericht steht `PRÜFEN`, wenn das Foto kleiner als 1000 px ist.
+Betroffen sind `apiinvert-bienenfutter-14-kg-eimer` (300 px), `apifonda-…-5-2-5-kg`
+(280 px), `neutrale-honigglaser-…` (455 px), `zander-halb-und-flachzargen-…` (577 px)
+und `dnm-raehmchen-hoffmann-…` (657 px). Ohne Foto in Shopify und damit ohne Hauptbild:
+Nicot Kunststoff-Fütterer Dadant und Apiinvert 28 kg Karton.
