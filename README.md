@@ -137,3 +137,8 @@ So überträgst du die Änderungen manuell in ein anderes Theme: Im Code-Editor 
 aus `theme/assets`, `theme/snippets` und `theme/sections` neu anlegen. Danach die
 Änderungen an `layout/theme.liquid`, `sections/apibavaria-home-focus.liquid` und
 `config/settings_schema.json` übernehmen. Die Stellen sind im Code kommentiert.
+
+## Amazon-Bilder (Rähmchen & Mittelwände)
+
+Generator für Hauptbild, Mengen-/Set-Bild, USP-Bild und Maßbild aller Rähmchen- und
+Mittelwand-Angebote in der CI: siehe [`amazon/README.md`](amazon/README.md).
