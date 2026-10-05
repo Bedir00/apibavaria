@@ -23,3 +23,14 @@ Besser für das Hauptbild ist trotzdem ein echtes Foto des ganzen Pakets (z. B. 
 | `mittelwand-zander.png` | 1 Mittelwand 395 × 195 mm |
 | `mittelwand-zander-flachzarge.png` | 1 Mittelwand 410 × 145 mm |
 | `mittelwand-dadant-us-brutraum.png` | 1 Mittelwand 420 × 260 mm |
+
+## Fotos aus Shopify laden
+
+```
+python3 amazon/fotos_laden.py products_export.csv
+```
+
+Lädt alle Bilder der Rähmchen- und Mittelwand-Produkte aus dem Shopify-Produktexport
+nach `fotos/shopify/` und legt zu jedem Bild eine freigestellte PNG daneben (weißer
+Hintergrund wird transparent). Das passende Bild dann unter dem Namen aus der Tabelle
+oben nach `fotos/` kopieren.
